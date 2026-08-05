@@ -1,0 +1,555 @@
+
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arc RWA Vault — Ledger</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.17.0/ethers.umd.min.js"></script>
+<style>
+  :root {
+    --ink: #0b0e1a;
+    --panel: #141a2e;
+    --panel-2: #1b2340;
+    --line: #2a3358;
+    --brass: #c9a54e;
+    --brass-soft: #e3c878;
+    --sage: #4f9c82;
+    --brick: #b5533c;
+    --parchment: #ede9de;
+    --muted: #8891ab;
+    --radius: 14px;
+  }
+  * { box-sizing: border-box; }
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+  }
+  html, body {
+    margin: 0; background: var(--ink); color: var(--parchment);
+    font-family: 'IBM Plex Sans', sans-serif; direction: rtl;
+    min-height: 100vh;
+  }
+  .mono { font-family: 'IBM Plex Mono', monospace; direction: ltr; text-align: left; unicode-bidi: isolate; }
+  h1, h2, h3, .display { font-family: 'Fraunces', serif; }
+  a { color: var(--brass-soft); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  button {
+    font-family: 'IBM Plex Sans', sans-serif; cursor: pointer; border-radius: 10px;
+    border: 1px solid var(--line); background: var(--panel-2); color: var(--parchment);
+    padding: 10px 16px; font-size: 14px; transition: border-color .15s, transform .1s;
+  }
+  button:hover:not(:disabled) { border-color: var(--brass); }
+  button:active:not(:disabled) { transform: scale(0.98); }
+  button:disabled { opacity: 0.45; cursor: not-allowed; }
+  button:focus-visible, input:focus-visible, a:focus-visible {
+    outline: 2px solid var(--brass-soft); outline-offset: 2px;
+  }
+  button.primary { background: var(--brass); color: #1a1406; border-color: var(--brass); font-weight: 600; }
+  button.primary:hover:not(:disabled) { background: var(--brass-soft); }
+  input {
+    background: var(--ink); border: 1px solid var(--line); color: var(--parchment);
+    border-radius: 8px; padding: 9px 12px; font-size: 14px; width: 100%;
+    font-family: 'IBM Plex Mono', monospace; direction: ltr; text-align: left;
+  }
+  input::placeholder { color: #4a5578; }
+
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 18px 20px 60px; }
+
+  header.topbar {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 14px 0; border-bottom: 1px solid var(--line); margin-bottom: 22px; flex-wrap: wrap;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .brand .mark {
+    width: 34px; height: 34px; border-radius: 8px; background: linear-gradient(155deg, var(--brass) 0%, #7a5f22 100%);
+    display: flex; align-items: center; justify-content: center; font-family: 'Fraunces', serif; font-weight: 600; color: #1a1406;
+  }
+  .brand-title { font-size: 17px; font-weight: 600; letter-spacing: .01em; }
+  .brand-sub { font-size: 11px; color: var(--muted); margin-top: -2px; }
+  .badge {
+    display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; padding: 5px 10px;
+    border-radius: 999px; border: 1px solid var(--line); color: var(--muted); background: var(--panel);
+  }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--sage); }
+  .topbar-right { display: flex; align-items: center; gap: 10px; }
+
+  .banner {
+    background: #241a10; border: 1px solid #4a3418; color: var(--brass-soft);
+    border-radius: var(--radius); padding: 14px 18px; margin-bottom: 20px; font-size: 13.5px; line-height: 1.7;
+  }
+  .banner button { margin-top: 8px; }
+
+  .hero { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+  @media (max-width: 720px) { .hero { grid-template-columns: 1fr; } }
+
+  .card {
+    background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 20px; opacity: 0; animation: rise .5s ease forwards;
+  }
+  @keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  .card h3 { margin: 0 0 14px; font-size: 15px; font-weight: 500; color: var(--muted); letter-spacing: .02em; }
+
+  .ring-row { display: flex; align-items: center; gap: 18px; }
+  .ring-wrap { position: relative; width: 128px; height: 128px; flex-shrink: 0; }
+  .ring-wrap svg { transform: rotate(-90deg); }
+  .ring-label { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .ring-label .num { font-family: 'Fraunces', serif; font-size: 24px; font-weight: 600; }
+  .ring-label .lbl { font-size: 10px; color: var(--muted); margin-top: 2px; }
+  .stat-list { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+  .stat-row { display: flex; justify-content: space-between; font-size: 13px; }
+  .stat-row .k { color: var(--muted); }
+  .stat-row .v { font-family: 'IBM Plex Mono', monospace; direction: ltr; }
+
+  .seal-row { display: flex; align-items: center; gap: 16px; }
+  .seal {
+    width: 88px; height: 88px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+    border: 2.5px dashed var(--line); position: relative;
+  }
+  .seal.verified { border-color: var(--sage); }
+  .seal.pending { border-color: var(--brick); }
+  .seal .tier { font-family: 'Fraunces', serif; font-size: 11px; text-align: center; line-height: 1.3; padding: 0 6px; }
+  .seal.verified .tier { color: var(--sage); }
+  .seal.pending .tier { color: var(--brick); }
+
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  @media (max-width: 720px) { .grid2 { grid-template-columns: 1fr; } }
+
+  .field { margin-bottom: 12px; }
+  .field label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+  .hint { font-size: 11.5px; color: var(--muted); margin-top: 6px; line-height: 1.6; }
+  .row-btns { display: flex; gap: 8px; margin-top: 12px; }
+
+  details.settings { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 4px 20px 18px; margin-bottom: 20px; }
+  details.settings summary { padding: 14px 0; cursor: pointer; font-size: 14px; color: var(--muted); list-style: none; }
+  details.settings summary::-webkit-details-marker { display: none; }
+
+  table.ledger { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  table.ledger th { text-align: right; color: var(--muted); font-weight: 500; padding: 8px 6px; border-bottom: 1px solid var(--line); }
+  table.ledger td { padding: 9px 6px; border-bottom: 1px solid #1c2440; font-family: 'IBM Plex Mono', monospace; direction: ltr; text-align: left; }
+  table.ledger td.rtl-cell { direction: rtl; text-align: right; font-family: 'IBM Plex Sans', sans-serif; }
+  .tx-ok { color: var(--sage); }
+  .tx-fail { color: var(--brick); }
+  .tx-pending { color: var(--brass-soft); }
+  .empty-ledger { color: var(--muted); font-size: 13px; padding: 20px 0; text-align: center; }
+
+  .toast {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+    background: var(--panel-2); border: 1px solid var(--brass); color: var(--parchment);
+    padding: 12px 20px; border-radius: 10px; font-size: 13px; max-width: 90vw; z-index: 50;
+    box-shadow: 0 8px 24px rgba(0,0,0,.4);
+  }
+  footer { text-align: center; color: var(--muted); font-size: 11.5px; margin-top: 30px; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="mark">A</div>
+      <div>
+        <div class="brand-title">Arc RWA Vault</div>
+        <div class="brand-sub">Self-paying RWA collateral ledger</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <span class="badge"><span class="dot" id="netDot"></span><span id="netLabel">Arc Testnet</span></span>
+      <button id="btnConnect" class="primary">اتصال کیف‌پول</button>
+    </div>
+  </header>
+
+  <div class="banner" id="configBanner" style="display:none;">
+    <strong>⚠ آدرس قراردادها هنوز تنظیم نشده.</strong> برای استفاده، آدرس‌های Vault، AttestationRegistry، ComplianceRegistry و MockRWAToken که موقع دیپلوی گرفتی را در بخش «⚙ تنظیمات» پایین وارد کن.
+  </div>
+
+  <details class="settings" id="settingsBox">
+    <summary>⚙ تنظیمات — آدرس قراردادها</summary>
+    <div class="grid2">
+      <div class="field"><label>ArcRWASelfPayingVault</label><input id="cfgVault" placeholder="0x..."></div>
+      <div class="field"><label>AttestationRegistry</label><input id="cfgAttestation" placeholder="0x..."></div>
+      <div class="field"><label>ComplianceRegistry</label><input id="cfgCompliance" placeholder="0x..."></div>
+      <div class="field"><label>MockRWAToken (وثیقه تست)</label><input id="cfgRwa" placeholder="0x..."></div>
+    </div>
+    <button class="primary" id="btnSaveConfig">ذخیره</button>
+    <p class="hint">این آدرس‌ها فقط در همین مرورگر و برای شما ذخیره می‌شوند.</p>
+  </details>
+
+  <section class="hero">
+    <div class="card" style="animation-delay:.05s">
+      <h3>وضعیت وثیقه و بدهی</h3>
+      <div class="ring-row">
+        <div class="ring-wrap">
+          <svg width="128" height="128" viewBox="0 0 128 128">
+            <circle cx="64" cy="64" r="54" fill="none" stroke="#232c4d" stroke-width="12"/>
+            <circle id="healthRing" cx="64" cy="64" r="54" fill="none" stroke="var(--sage)" stroke-width="12"
+                    stroke-linecap="round" stroke-dasharray="339.3" stroke-dashoffset="339.3"
+                    style="transition: stroke-dashoffset .6s ease, stroke .3s ease;"/>
+          </svg>
+          <div class="ring-label">
+            <div class="num" id="healthNum">—</div>
+            <div class="lbl">سلامت</div>
+          </div>
+        </div>
+        <div class="stat-list">
+          <div class="stat-row"><span class="k">وثیقه واریزی</span><span class="v" id="statCollateral">—</span></div>
+          <div class="stat-row"><span class="k">بدهی فعلی (USDC)</span><span class="v" id="statDebt">—</span></div>
+          <div class="stat-row"><span class="k">نرخ استریم فعال</span><span class="v" id="statFlow">—</span></div>
+          <div class="stat-row"><span class="k">سقف LTV / قیمت</span><span class="v" id="statLtv">—</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="animation-delay:.1s">
+      <h3>وضعیت Compliance</h3>
+      <div class="seal-row">
+        <div class="seal pending" id="complianceSeal">
+          <div class="tier" id="complianceTierText">نامعلوم</div>
+        </div>
+        <div class="stat-list">
+          <div class="stat-row"><span class="k">KYC</span><span class="v" id="statKyc">—</span></div>
+          <div class="stat-row"><span class="k">محدودیت (AML)</span><span class="v" id="statRestricted">—</span></div>
+          <div class="stat-row"><span class="k">سقف وام مجاز</span><span class="v" id="statMaxLoan">—</span></div>
+          <div class="stat-row"><span class="k">Attestation</span><span class="v" id="statAttestation">—</span></div>
+        </div>
+      </div>
+      <div class="row-btns">
+        <button id="btnSelfAttest">Attest خودم (admin/demo)</button>
+        <button id="btnSelfKyc">KYC خودم (admin/demo)</button>
+      </div>
+      <p class="hint">این دو دکمه فقط برای آدرسی کار می‌کند که نقش attester/officer دارد (معمولاً همان deployer در حالت دمو).</p>
+    </div>
+  </section>
+
+  <section class="grid2">
+    <div class="card" style="animation-delay:.15s">
+      <h3>واریز وثیقه و گرفتن وام</h3>
+      <div class="field"><label>مقدار وثیقه (RWA، مثلاً 1)</label><input id="inCollateral" placeholder="1"></div>
+      <div class="field"><label>مقدار وام (USDC، مثلاً 600)</label><input id="inBorrow" placeholder="600"></div>
+      <div class="field"><label>Attestation ID</label><input id="inAttestationId" placeholder="1"></div>
+      <button class="primary" id="btnDeposit" style="width:100%;">تایید وثیقه + واریز و وام</button>
+      <p class="hint" id="depositHint">ابتدا کیف‌پول را وصل کن.</p>
+    </div>
+
+    <div class="card" style="animation-delay:.2s">
+      <h3>بازپرداخت و استریم</h3>
+      <div class="field"><label>مقدار بازپرداخت دستی (USDC)</label><input id="inRepay" placeholder="100"></div>
+      <button id="btnRepay" style="width:100%; margin-bottom:14px;">بازپرداخت دستی</button>
+      <div class="field"><label>نرخ استریم (USDC در ثانیه، مثلاً 1)</label><input id="inFlowRate" placeholder="1"></div>
+      <div class="row-btns" style="margin-top:0;">
+        <button id="btnStartStream" style="flex:1;">شروع استریم</button>
+        <button id="btnSettleStream" style="flex:1;">تسویه الان</button>
+      </div>
+      <p class="hint">«شروع استریم» به Vault اجازه‌ی نامحدود USDC هم می‌دهد تا «تسویه الان» بتواند خودکار بکشد.</p>
+    </div>
+  </section>
+
+  <div class="card" style="animation-delay:.25s">
+    <h3>دفتر تراکنش‌های این جلسه</h3>
+    <div id="ledgerEmpty" class="empty-ledger">هنوز تراکنشی در این جلسه ثبت نشده.</div>
+    <table class="ledger" id="ledgerTable" style="display:none;">
+      <thead><tr><th>عملیات</th><th>وضعیت</th><th>تراکنش</th></tr></thead>
+      <tbody id="ledgerBody"></tbody>
+    </table>
+  </div>
+
+  <footer>Arc Testnet · Chain ID 5042002 · <a href="https://testnet.arcscan.app" target="_blank" rel="noopener">ArcScan ↗</a></footer>
+</div>
+
+<div id="toast" class="toast" style="display:none;"></div>
+
+<script>
+const ARC = {
+  chainIdHex: '0x4cef52',
+  chainIdDec: 5042002,
+  rpcUrl: 'https://rpc.testnet.arc.network',
+  explorer: 'https://testnet.arcscan.app',
+  usdc: '0x3600000000000000000000000000000000000000',
+};
+const USDC_DECIMALS = 6;
+const RWA_DECIMALS = 18;
+const CONFIG_KEY = 'arc-vault-frontend-config';
+const TIER_NAMES = ['None', 'Retail', 'Accredited', 'Institutional'];
+
+const VAULT_ABI = [
+  'function depositRWAAndBorrow(uint256 collateralAmount, uint256 usdcBorrowAmount, uint64 attestationId) external',
+  'function repay(uint256 amount) external',
+  'function startSelfPayingStream(uint256 flowRatePerSecond) external',
+  'function settleStream(address borrower) external',
+  'function getLoan(address borrower) view returns (tuple(uint256 collateralAmount, uint256 principal, uint64 attestationId, uint64 lastAccrual, uint256 flowRate, bool isActive))',
+  'function currentDebt(address borrower) view returns (uint256)',
+  'function healthFactorBps(address borrower) view returns (uint256)',
+  'function collateralPriceUSDC() view returns (uint256)',
+  'function maxLTVBps() view returns (uint256)',
+];
+const ERC20_ABI = [
+  'function approve(address spender, uint256 amount) external returns (bool)',
+  'function allowance(address owner, address spender) view returns (uint256)',
+  'function balanceOf(address account) view returns (uint256)',
+];
+const COMPLIANCE_ABI = [
+  'function checkEligibility(address subject, uint256 loanValueUSDC) view returns (bool)',
+  'function getProfile(address subject) view returns (tuple(bool kycVerified, bool restricted, uint8 tier, uint64 verifiedAt, uint64 expiresAt))',
+  'function setProfile(address subject, bool kycVerified, uint8 tier, uint64 validityPeriod) external',
+  'function maxLoanForTier(uint8 tier) view returns (uint256)',
+];
+const ATTESTATION_ABI = [
+  'function isValid(uint64 id, address subject) view returns (bool)',
+  'function attest(address subject, bytes32 assetHash, uint64 validityPeriod) external returns (uint64)',
+  'function nextAttestationId() view returns (uint64)',
+];
+
+let config = { vault: '', attestation: '', compliance: '', rwaToken: '' };
+let provider, signer, userAddress;
+
+function $(id) { return document.getElementById(id); }
+
+function toast(msg, ms = 4200) {
+  const t = $('toast');
+  t.textContent = msg;
+  t.style.display = 'block';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => (t.style.display = 'none'), ms);
+}
+
+function fmt(v, decimals, maxFrac = 4) {
+  try { return Number(ethers.formatUnits(v, decimals)).toLocaleString('en-US', { maximumFractionDigits: maxFrac }); }
+  catch (e) { return '—'; }
+}
+
+async function loadConfig() {
+  try {
+    const res = await window.storage.get(CONFIG_KEY);
+    if (res && res.value) config = { ...config, ...JSON.parse(res.value) };
+  } catch (e) { /* nothing saved yet */ }
+  $('cfgVault').value = config.vault || '';
+  $('cfgAttestation').value = config.attestation || '';
+  $('cfgCompliance').value = config.compliance || '';
+  $('cfgRwa').value = config.rwaToken || '';
+  refreshConfigBanner();
+}
+
+function refreshConfigBanner() {
+  const missing = !config.vault || !config.attestation || !config.compliance || !config.rwaToken;
+  $('configBanner').style.display = missing ? 'block' : 'none';
+  if (missing) $('settingsBox').setAttribute('open', 'true');
+}
+
+$('btnSaveConfig').addEventListener('click', async () => {
+  config = {
+    vault: $('cfgVault').value.trim(),
+    attestation: $('cfgAttestation').value.trim(),
+    compliance: $('cfgCompliance').value.trim(),
+    rwaToken: $('cfgRwa').value.trim(),
+  };
+  try {
+    await window.storage.set(CONFIG_KEY, JSON.stringify(config));
+    toast('تنظیمات ذخیره شد.');
+    refreshConfigBanner();
+    if (userAddress) refreshAll();
+  } catch (e) { toast('خطا در ذخیره‌ی تنظیمات: ' + e.message); }
+});
+
+async function ensureArcNetwork() {
+  try {
+    await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: ARC.chainIdHex }] });
+  } catch (err) {
+    if (err.code === 4902 || (err.data && err.data.originalError && err.data.originalError.code === 4902)) {
+      await window.ethereum.request({
+        method: 'wallet_addEthereumChain',
+        params: [{
+          chainId: ARC.chainIdHex,
+          chainName: 'Arc Testnet',
+          rpcUrls: [ARC.rpcUrl],
+          nativeCurrency: { name: 'USDC', symbol: 'USDC', decimals: 18 },
+          blockExplorerUrls: [ARC.explorer],
+        }],
+      });
+    } else { throw err; }
+  }
+}
+
+$('btnConnect').addEventListener('click', connectWallet);
+async function connectWallet() {
+  if (!window.ethereum) { toast('کیف‌پولی مثل MetaMask پیدا نشد.'); return; }
+  try {
+    await ensureArcNetwork();
+    provider = new ethers.BrowserProvider(window.ethereum);
+    const accounts = await provider.send('eth_requestAccounts', []);
+    signer = await provider.getSigner();
+    userAddress = accounts[0];
+    $('btnConnect').textContent = userAddress.slice(0, 6) + '…' + userAddress.slice(-4);
+    $('netDot').style.background = 'var(--sage)';
+    toast('وصل شد: ' + userAddress);
+    refreshAll();
+  } catch (e) { toast('خطا در اتصال: ' + (e.shortMessage || e.message)); }
+}
+
+function contracts() {
+  return {
+    vault: new ethers.Contract(config.vault, VAULT_ABI, signer),
+    rwa: new ethers.Contract(config.rwaToken, ERC20_ABI, signer),
+    usdc: new ethers.Contract(ARC.usdc, ERC20_ABI, signer),
+    compliance: new ethers.Contract(config.compliance, COMPLIANCE_ABI, signer),
+    attestation: new ethers.Contract(config.attestation, ATTESTATION_ABI, signer),
+  };
+}
+
+function setRing(bps) {
+  const CIRC = 339.3;
+  const ring = $('healthRing');
+  if (bps === null) {
+    ring.style.strokeDashoffset = CIRC;
+    $('healthNum').textContent = '—';
+    return;
+  }
+  const ratio = Number(bps) / 10000;
+  const clamped = Math.min(ratio, 2);
+  const offset = CIRC - (clamped / 2) * CIRC;
+  ring.style.strokeDashoffset = offset;
+  ring.style.stroke = ratio >= 1.2 ? 'var(--sage)' : ratio >= 1.0 ? 'var(--brass)' : 'var(--brick)';
+  $('healthNum').textContent = ratio.toFixed(2) + 'x';
+}
+
+async function refreshAll() {
+  if (!signer || !userAddress) return;
+  if (!config.vault || !config.compliance || !config.attestation || !config.rwaToken) return;
+  const { vault, compliance } = contracts();
+
+  try {
+    const loan = await vault.getLoan(userAddress);
+    $('statCollateral').textContent = fmt(loan.collateralAmount, RWA_DECIMALS) + ' RWA';
+    $('statFlow').textContent = loan.isActive && loan.flowRate > 0n
+      ? fmt(loan.flowRate, USDC_DECIMALS, 6) + ' USDC/s' : '—';
+
+    if (loan.isActive) {
+      const debt = await vault.currentDebt(userAddress);
+      $('statDebt').textContent = fmt(debt, USDC_DECIMALS, 2) + ' USDC';
+      if (debt > 0n) {
+        const health = await vault.healthFactorBps(userAddress);
+        setRing(health);
+      } else { setRing(null); }
+    } else {
+      $('statDebt').textContent = '۰ (بدون وام فعال)';
+      setRing(null);
+    }
+
+    const price = await vault.collateralPriceUSDC();
+    const ltv = await vault.maxLTVBps();
+    $('statLtv').textContent = (Number(ltv) / 100) + '% @ ' + fmt(price, USDC_DECIMALS, 0) + ' USDC';
+
+    const profile = await compliance.getProfile(userAddress);
+    $('statKyc').textContent = profile.kycVerified ? 'تایید شده ✓' : 'تایید نشده';
+    $('statRestricted').textContent = profile.restricted ? 'محدود شده ⛔' : 'آزاد';
+    const tierNum = Number(profile.tier);
+    const maxLoan = await compliance.maxLoanForTier(tierNum);
+    $('statMaxLoan').textContent = fmt(maxLoan, USDC_DECIMALS, 0) + ' USDC';
+
+    const seal = $('complianceSeal');
+    const eligible = profile.kycVerified && !profile.restricted;
+    seal.className = 'seal ' + (eligible ? 'verified' : 'pending');
+    $('complianceTierText').textContent = eligible ? TIER_NAMES[tierNum] || '—' : 'در انتظار';
+
+    $('depositHint').textContent = eligible
+      ? 'وثیقه/وام باید در سقف LTV و سقف tier (' + (TIER_NAMES[tierNum] || '') + ') باشد.'
+      : 'ابتدا باید KYC شوید تا بتوانید وام بگیرید.';
+  } catch (e) {
+    console.error(e);
+    toast('خطا در خوانده داده‌ها — آدرس قراردادها را در تنظیمات چک کنید.');
+  }
+}
+
+function addLedgerRow(action, status, hash) {
+  $('ledgerEmpty').style.display = 'none';
+  $('ledgerTable').style.display = 'table';
+  const tr = document.createElement('tr');
+  const link = hash ? `<a href="${ARC.explorer}/tx/${hash}" target="_blank" rel="noopener">${hash.slice(0,10)}…↗</a>` : '—';
+  const cls = status === 'موفق' ? 'tx-ok' : status === 'ناموفق' ? 'tx-fail' : 'tx-pending';
+  tr.innerHTML = `<td class="rtl-cell">${action}</td><td class="${cls}">${status}</td><td>${link}</td>`;
+  $('ledgerBody').prepend(tr);
+  return tr;
+}
+
+async function runTx(label, fn) {
+  const row = addLedgerRow(label, 'در حال ارسال…', null);
+  try {
+    const tx = await fn();
+    row.innerHTML = `<td class="rtl-cell">${label}</td><td class="tx-pending">در انتظار تایید…</td><td class="mono">${tx.hash.slice(0,10)}…</td>`;
+    const receipt = await tx.wait();
+    const ok = receipt.status === 1;
+    row.innerHTML = `<td class="rtl-cell">${label}</td><td class="${ok ? 'tx-ok' : 'tx-fail'}">${ok ? 'موفق' : 'ناموفق'}</td>` +
+      `<td><a href="${ARC.explorer}/tx/${tx.hash}" target="_blank" rel="noopener">${tx.hash.slice(0,10)}…↗</a></td>`;
+    toast(label + (ok ? ' — موفق ✓' : ' — ناموفق'));
+    refreshAll();
+    return receipt;
+  } catch (e) {
+    row.innerHTML = `<td class="rtl-cell">${label}</td><td class="tx-fail">رد شد</td><td>—</td>`;
+    toast('خطا: ' + (e.shortMessage || e.reason || e.message));
+    throw e;
+  }
+}
+
+$('btnSelfAttest').addEventListener('click', async () => {
+  if (!signer) return toast('اول کیف‌پول را وصل کن.');
+  const { attestation } = contracts();
+  const hash = ethers.keccak256(ethers.toUtf8Bytes('demo-asset-' + Date.now()));
+  await runTx('Self-attest', () => attestation.attest(userAddress, hash, 31536000n));
+});
+
+$('btnSelfKyc').addEventListener('click', async () => {
+  if (!signer) return toast('اول کیف‌پول را وصل کن.');
+  const { compliance } = contracts();
+  await runTx('Self-KYC (Retail)', () => compliance.setProfile(userAddress, true, 1, 31536000n));
+});
+
+$('btnDeposit').addEventListener('click', async () => {
+  if (!signer) return toast('اول کیف‌پول را وصل کن.');
+  const collateral = ethers.parseUnits($('inCollateral').value || '0', RWA_DECIMALS);
+  const borrow = ethers.parseUnits($('inBorrow').value || '0', USDC_DECIMALS);
+  const attId = BigInt($('inAttestationId').value || '0');
+  if (collateral === 0n || borrow === 0n) return toast('مقدار وثیقه و وام را وارد کن.');
+  const { rwa, vault } = contracts();
+  const allowance = await rwa.allowance(userAddress, config.vault);
+  if (allowance < collateral) {
+    await runTx('Approve RWA collateral', () => rwa.approve(config.vault, collateral));
+  }
+  await runTx('واریز وثیقه + گرفتن وام', () => vault.depositRWAAndBorrow(collateral, borrow, attId));
+});
+
+$('btnRepay').addEventListener('click', async () => {
+  if (!signer) return toast('اول کیف‌پول را وصل کن.');
+  const amount = ethers.parseUnits($('inRepay').value || '0', USDC_DECIMALS);
+  if (amount === 0n) return toast('مقدار بازپرداخت را وارد کن.');
+  const { usdc, vault } = contracts();
+  const allowance = await usdc.allowance(userAddress, config.vault);
+  if (allowance < amount) {
+    await runTx('Approve USDC', () => usdc.approve(config.vault, amount));
+  }
+  await runTx('بازپرداخت دستی', () => vault.repay(amount));
+});
+
+$('btnStartStream').addEventListener('click', async () => {
+  if (!signer) return toast('اول کیف‌پول را وصل کن.');
+  const rate = ethers.parseUnits($('inFlowRate').value || '0', USDC_DECIMALS);
+  if (rate === 0n) return toast('نرخ استریم را وارد کن.');
+  const { usdc, vault } = contracts();
+  const allowance = await usdc.allowance(userAddress, config.vault);
+  if (allowance < ethers.MaxUint256 / 2n) {
+    await runTx('Approve USDC (نامحدود، برای استریم)', () => usdc.approve(config.vault, ethers.MaxUint256));
+  }
+  await runTx('شروع استریم', () => vault.startSelfPayingStream(rate));
+});
+
+$('btnSettleStream').addEventListener('click', async () => {
+  if (!signer) return toast('اول کیف‌پول را وصل کن.');
+  const { vault } = contracts();
+  await runTx('تسویه استریم', () => vault.settleStream(userAddress));
+});
+
+loadConfig();
+</script>
+</body>
+</html>
+
