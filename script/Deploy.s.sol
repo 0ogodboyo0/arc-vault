@@ -12,10 +12,10 @@ import "../src/SelfPayingVault.sol";
 ///      2. MockRWAToken (skip this and pass a real RWA token address if you have one)
 ///      3. ArcRWASelfPayingVault, wired to (1) and (2), plus Arc Testnet's native USDC ERC20 wrapper
 ///
-/// Arc Testnet USDC ERC20 wrapper (6 decimals): 0x36000000000000000000000000000000000000000
+/// Arc Testnet USDC ERC20 wrapper (6 decimals): 0x3600000000000000000000000000000000000000
 /// Chain ID: 5042002 | RPC: https://rpc.testnet.arc.network | Explorer: https://testnet.arcscan.app
 contract DeployScript is Script {
-    address constant ARC_TESTNET_USDC = 0x36000000000000000000000000000000000000000;
+    address constant ARC_TESTNET_USDC = 0x3600000000000000000000000000000000000000;
 
     function run() external {
         uint256 deployerKey = vm.envUint("PRIVATE_KEY");
