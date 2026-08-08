@@ -321,7 +321,7 @@ function fmt(v, decimals, maxFrac = 4) {
 
 async function loadConfig() {
   try {
-    const res = await window.storage.get(CONFIG_KEY);
+    const res = localStorage.getItem(CONFIG_KEY);
     if (res && res.value) config = { ...config, ...JSON.parse(res.value) };
   } catch (e) { /* nothing saved yet */ }
   $('cfgVault').value = config.vault || '';
@@ -345,7 +345,7 @@ $('btnSaveConfig').addEventListener('click', async () => {
     rwaToken: $('cfgRwa').value.trim(),
   };
   try {
-    await window.storage.set(CONFIG_KEY, JSON.stringify(config));
+    localStorage.setItem(CONFIG_KEY, JSON.stringify(config));
     toast('تنظیمات ذخیره شد.');
     refreshConfigBanner();
     if (userAddress) refreshAll();
