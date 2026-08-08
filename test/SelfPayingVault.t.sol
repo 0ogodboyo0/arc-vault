@@ -244,11 +244,12 @@ contract SelfPayingVaultTest is Test {
         uint64 id = _attestBorrower();
         _kyc(ComplianceRegistry.AccreditationTier.Retail);
 
+        vm.startPrank(borrower);
+        rwa.approve(address(vault), 1 ether);
+
         vm.expectEmit(true, false, false, true, address(compliance));
         emit EligibilityChecked(borrower, 600e6, true);
 
-        vm.startPrank(borrower);
-        rwa.approve(address(vault), 1 ether);
         vault.depositRWAAndBorrow(1 ether, 600e6, id);
         vm.stopPrank();
     }

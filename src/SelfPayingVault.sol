@@ -257,11 +257,12 @@ contract ArcRWASelfPayingVault {
     function settleStream(address borrower) public whenNotPaused nonReentrant {
         LoanPosition storage loan = loans[borrower];
         require(loan.isActive, "no active loan");
+
+        uint256 elapsed = block.timestamp - loan.lastAccrual; // capture before _accrueInterest resets it
         _accrueInterest(loan);
 
         if (loan.flowRate == 0 || loan.principal == 0) return;
 
-        uint256 elapsed = block.timestamp - loan.lastAccrual;
         uint256 due = loan.flowRate * elapsed;
         if (due == 0) return;
 
