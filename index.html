@@ -345,7 +345,7 @@ $('btnSaveConfig').addEventListener('click', async () => {
     rwaToken: $('cfgRwa').value.trim(),
   };
   try {
-    localStorage.setItem(CONFIG_KEY, JSON.stringify(config));
+    localStorage.setItem(CONFIG_KEY, JSON.stringify(config)); console.log("Config saved:", config);
     toast('تنظیمات ذخیره شد.');
     refreshConfigBanner();
     if (userAddress) refreshAll();
