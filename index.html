@@ -299,6 +299,7 @@ const ATTESTATION_ABI = [
   'function isValid(uint64 id, address subject) view returns (bool)',
   'function attest(address subject, bytes32 assetHash, uint64 validityPeriod) external returns (uint64)',
   'function nextAttestationId() view returns (uint64)',
+  'event AttestationIssued(uint64 indexed id, address indexed attester, address indexed subject, bytes32 assetHash, uint64 expiresAt)',
 ];
 
 let config = { vault: '', attestation: '', compliance: '', rwaToken: '' };
