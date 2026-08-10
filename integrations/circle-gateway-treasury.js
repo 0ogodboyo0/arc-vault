@@ -1,3 +1,11 @@
+
+// Default contract constants
+if (!localStorage.getItem('vaultAddress')) {
+    localStorage.setItem('vaultAddress', '0x6f29286af2134afce4619038a2cd7a48666449d7');
+    localStorage.setItem('attestationAddress', '0xE49151151A55a84909e581066233de33f4d0f396');
+    localStorage.setItem('complianceAddress', '0x28b0fe105D3A936eA72791d5730991df8A0e6863');
+    localStorage.setItem('rwaAddress', '0x7306e00a86a1ceebeb99645ab7c9f5ef019d8751');
+}
 /**
  * Circle Gateway integration — unified treasury liquidity for collected repayments.
  * =================================================================================================

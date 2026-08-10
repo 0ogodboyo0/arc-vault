@@ -1,0 +1,25 @@
+import os
+
+path = "src/SelfPayingVault.sol"
+if os.path.exists(path):
+    with open(path, "r", encoding="utf-8", errors="ignore") as f:
+        lines = f.readlines()
+    
+    print("=== ۱. متغیرهای تعریف‌شده در بالای قرارداد ===")
+    for i in range(min(50, len(lines))):
+        if any(kw in lines[i] for kw in ["IERC20", "address", "uint256", "ISuperfluid", "IRWA"]):
+            print(f"Line {i+1}: {lines[i].strip()}")
+            
+    print("\n=== ۲. بدنه کامل تابع depositAndBorrow ===")
+    start = False
+    brace_count = 0
+    for i, line in enumerate(lines):
+        if "function depositAndBorrow" in line:
+            start = True
+        if start:
+            print(f"Line {i+1}: {line.rstrip()}")
+            brace_count += line.count('{') - line.count('}')
+            if brace_count == 0 and "function" not in line:
+                break
+else:
+    print("❌ فایل یافت نشد!")

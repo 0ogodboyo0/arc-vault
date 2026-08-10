@@ -210,7 +210,24 @@ contract ArcRWASelfPayingVault {
         uint256 usdcBorrowAmount,
         uint64 attestationId
     ) external whenNotPaused nonReentrant {
-        require(!loans[msg.sender].isActive, "active loan exists");
+        // اگر وام فعال بود، به همان پوزیشن قبلی اضافه می‌شود
+        if (loans[msg.sender].isActive) {
+            uint256 totalCollateral = loans[msg.sender].collateralAmount + collateralAmount;
+            uint256 totalBorrow = loans[msg.sender].principal + usdcBorrowAmount;
+            
+            uint256 totalCollateralValue = (totalCollateral * collateralPriceUSDC) / COLLATERAL_DECIMALS;
+            uint256 maxBorrowAllowed = (totalCollateralValue * maxLTVBps) / BPS_DENOMINATOR;
+            require(totalBorrow <= maxBorrowAllowed, "exceeds max LTV");
+            
+            require(complianceRegistry.isEligible(msg.sender, usdcBorrowAmount), "compliance check failed");
+            require(rwaToken.transferFrom(msg.sender, address(this), collateralAmount), "collateral transfer failed");
+            
+            loans[msg.sender].collateralAmount = totalCollateral;
+            loans[msg.sender].principal = totalBorrow;
+            
+            require(usdc.transfer(msg.sender, usdcBorrowAmount), "USDC payout failed");
+            return;
+        }
         require(collateralAmount > 0 && usdcBorrowAmount > 0, "zero amount");
         require(attestationSource.isValid(attestationId, msg.sender), "invalid attestation");
 

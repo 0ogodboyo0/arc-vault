@@ -1,0 +1,33 @@
+import subprocess
+
+rpc = "https://rpc.testnet.arc.network"
+vault = "0x6f29286af2134afce4619038a2cd7a48666449d7"
+pk = "0x5f05eb81bae0844e7d31569d1bac2f0aa730e362d233c2f1c98b188334553fbf"
+user = "0x99fd2d64e7c59697dd001189e5c4d970320cca44"
+
+# توکن‌های شناسایی‌شده
+tokens = set(["0x7306e00a86a1ceebeb99645ab7c9f5ef019d8751"])
+
+# خواندن حافظه قرارداد جهت یافتن آدرس توکن‌های احتمالی دیگر (مثل USDC)
+for slot in range(10):
+    cmd = f"cast storage {vault} {slot} --rpc-url {rpc}"
+    res = subprocess.run(cmd, shell=True, capture_output=True, text=True).stdout.strip()
+    if len(res) >= 42:
+        addr = "0x" + res[-40:]
+        if addr != "0x0000000000000000000000000000000000000000" and addr.lower() != vault.lower():
+            tokens.add(addr)
+
+amount = "10000000000000000000000000" # ۱۰ میلیون توکن
+
+print(f"🔍 توکن‌های یافت‌شده در قرارداد Vault: {tokens}")
+
+for t in tokens:
+    print(f"\n⚡ در حال شارژ و تنظیم توکن {t}...")
+    # ۱. شارژ ولت شما
+    subprocess.run(f'cast send {t} "mint(address,uint256)" {user} {amount} --private-key {pk} --rpc-url {rpc}', shell=True)
+    # ۲. شارژ خزانه قرارداد
+    subprocess.run(f'cast send {t} "mint(address,uint256)" {vault} {amount} --private-key {pk} --rpc-url {rpc}', shell=True)
+    # ۳. صدور مجوز Approve
+    subprocess.run(f'cast send {t} "approve(address,uint256)" {vault} {amount} --private-key {pk} --rpc-url {rpc}', shell=True)
+
+print("\n✅ عملیات شارژ و Approve با موفقیت به پایان رسید.")
