@@ -142,6 +142,33 @@
   }
   footer { text-align: center; color: var(--muted); font-size: 11.5px; margin-top: 30px; }
 </style>
+
+<script>
+// کد اصلاحی برای تعامل با قراردادهای Arc Testnet
+async function issueAttestFix() {
+    try {
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const signer = provider.getSigner();
+        const address = await signer.getAddress();
+        const attestationAddr = "0xe49151151a55a84909e581066233de33f4d0f396";
+        const abi = ["function issueAttestation(address subject, bytes32 dataHash, uint64 validUntil) public returns (uint256)"];
+        const contract = new ethers.Contract(attestationAddr, abi, signer);
+        
+        const tx = await contract.issueAttestation(
+            address,
+            "0x0000000000000000000000000000000000000000000000000000000000000000",
+            1893456000
+        );
+        alert("تراکنش ثبت Attestation ارسال شد. لطفاً منتظر تایید بمانید...");
+        await tx.wait();
+        alert("Attestation با موفقیت ثبت شد!");
+        window.location.reload();
+    } catch (err) {
+        alert("خطا در ثبت Attestation: " + (err.reason || err.message));
+    }
+}
+</script>
+
 </head>
 <body>
 
