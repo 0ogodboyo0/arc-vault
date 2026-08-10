@@ -9,11 +9,11 @@ def run(cmd):
     res = subprocess.run(cmd, shell=True, capture_output=True, text=True)
     return res.stdout.strip()
 
-print("🔍 در حال اسکن پروژه و استخراج آدرس توکن‌ها...")
+print("🔍 Scanning the project and extracting the token address‌I see...")
 
 found_addresses = set(["0x7306e00a86a1ceebeb99645ab7c9f5ef019d8751"])
 
-# ۱. استخراج تمام آدرس‌های توکن از فایل‌های پروژه
+# 1. Extract all addresses‌I seeی token از فایل‌I seeی پروژه
 for f_path in glob.glob("**/*.*", recursive=True):
     if f_path.endswith((".sol", ".js", ".html", ".json")):
         try:
@@ -25,26 +25,26 @@ for f_path in glob.glob("**/*.*", recursive=True):
         except Exception:
             pass
 
-# ۲. فراخوانی توکن‌های مرتبط با قرارداد Vault
+# 2. Call Token‌related to the contract Vault
 getters = ["rwaToken", "usdcToken", "usdc", "borrowToken", "stablecoin", "token", "rwa", "collateralToken", "asset"]
 for g in getters:
     sig = g + "()(address)"
     cmd = 'cast call ' + vault + ' "' + sig + '" --rpc-url ' + rpc
     res = run(cmd)
     if res and res.startswith("0x") and len(res) == 42 and res != "0x0000000000000000000000000000000000000000":
-        print("✅ توکن پیدا شد (" + g + "): " + res)
+        print("✅ token پیدا شد (" + g + "): " + res)
         found_addresses.add(res)
 
-amount = "1000000000000000000000000" # ۱,۰۰۰,۰۰۰ توکن
+amount = "1000000000000000000000000" # 1,000,000 tokens
 
-print("\n⚡ در حال شارژ حساب‌ها...")
+print("\n⚡ Recharging the account‌I see...")
 for addr in found_addresses:
     cmd_user = 'cast send ' + addr + ' "mint(address,uint256)" ' + user + ' ' + amount + ' --private-key ' + pk + ' --rpc-url ' + rpc
     res_user = run(cmd_user)
     if "status" in res_user:
-        print("✔️ توکن " + addr + " برای ولت شما شارژ شد.")
+        print("✔️ token " + addr + " Charged for your volt.")
         cmd_vault = 'cast send ' + addr + ' "mint(address,uint256)" ' + vault + ' ' + amount + ' --private-key ' + pk + ' --rpc-url ' + rpc
         run(cmd_vault)
-        print("✔️ توکن " + addr + " برای خزانه Vault شارژ شد.")
+        print("✔️ token " + addr + " for the treasury Vault charged.")
 
-print("\n🎉 تمام توکن‌ها با موفقیت شارژ شدند.")
+print("\n🎉 تمام token‌I see با موفقیت chargedند.")

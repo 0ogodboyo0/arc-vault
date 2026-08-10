@@ -144,7 +144,7 @@
 </style>
 
 <script>
-// کد اصلاحی برای تعامل با قراردادهای Arc Testnet
+// Fixed code to interact with contracts Arc Testnet
 async function issueAttestFix() {
     try {
         const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -159,12 +159,12 @@ async function issueAttestFix() {
             "0x0000000000000000000000000000000000000000000000000000000000000000",
             1893456000
         );
-        alert("تراکنش ثبت Attestation ارسال شد. لطفاً منتظر تایید بمانید...");
+        alert("transaction ثبت Attestation sent Please wait for confirmation...");
         await tx.wait();
-        alert("Attestation با موفقیت ثبت شد!");
+        alert("Attestation با successfulیت ثبت شد!");
         window.location.reload();
     } catch (err) {
-        alert("خطا در ثبت Attestation: " + (err.reason || err.message));
+        alert("Error in registration Attestation: " + (err.reason || err.message));
     }
 }
 </script>
@@ -197,29 +197,29 @@ localStorage.setItem('rwaAddress', '0x7306e00a86a1ceebeb99645ab7c9f5ef019d8751')
     </div>
     <div class="topbar-right">
       <span class="badge"><span class="dot" id="netDot"></span><span id="netLabel">Arc Testnet</span></span>
-      <button id="btnConnect" class="primary">اتصال کیف‌پول</button>
+      <button id="btnConnect" class="primary">اتصال bag‌money</button>
     </div>
   </header>
 
   <div class="banner" id="configBanner" style="display:none;">
-    <strong>⚠ آدرس قراردادها هنوز تنظیم نشده.</strong> برای استفاده، آدرس‌های Vault، AttestationRegistry، ComplianceRegistry و MockRWAToken که موقع دیپلوی گرفتی را در بخش «⚙ تنظیمات» پایین وارد کن.
+    <strong>⚠ The contract address has not been set yet.</strong> To use, address‌Hi Vault, AttestationRegistry, ComplianceRegistry and MockRWAToken that you got your diploma in the department «⚙ Settings» Enter below.
   </div>
 
   <details class="settings" id="settingsBox">
-    <summary>⚙ تنظیمات — آدرس قراردادها</summary>
+    <summary>⚙ Settings — آدرس قراردادI see</summary>
     <div class="grid2">
       <div class="field"><label>ArcRWASelfPayingVault</label><input id="cfgVault" value="0x6f29286af2134afce4619038a2cd7a48666449d7" placeholder="0x..."></div>
       <div class="field"><label>AttestationRegistry</label><input id="cfgAttestation" value="0xE49151151A55a84909e581066233de33f4d0f396" placeholder="0x..."></div>
       <div class="field"><label>ComplianceRegistry</label><input id="cfgCompliance" value="0x28b0fe105D3A936eA72791d5730991df8A0e6863" placeholder="0x..."></div>
-      <div class="field"><label>MockRWAToken (وثیقه تست)</label><input id="cfgRwa" value="0x7306e00a86a1ceebeb99645ab7c9f5ef019d8751" placeholder="0x..."></div>
+      <div class="field"><label>MockRWAToken (Bail test)</label><input id="cfgRwa" value="0x7306e00a86a1ceebeb99645ab7c9f5ef019d8751" placeholder="0x..."></div>
     </div>
-    <button class="primary" id="btnSaveConfig">ذخیره</button>
-    <p class="hint">این آدرس‌ها فقط در همین مرورگر و برای شما ذخیره می‌شوند.</p>
+    <button class="primary" id="btnSaveConfig">save</button>
+    <p class="hint">This address‌I see فقط در همین مرandرگر and برای you save می‌become.</p>
   </details>
 
   <section class="hero">
     <div class="card" style="animation-delay:.05s">
-      <h3>وضعیت وثیقه و بدهی</h3>
+      <h3>Collateral and debt status</h3>
       <div class="ring-row">
         <div class="ring-wrap">
           <svg width="128" height="128" viewBox="0 0 128 128">
@@ -230,67 +230,67 @@ localStorage.setItem('rwaAddress', '0x7306e00a86a1ceebeb99645ab7c9f5ef019d8751')
           </svg>
           <div class="ring-label">
             <div class="num" id="healthNum">—</div>
-            <div class="lbl">سلامت</div>
+            <div class="lbl">health</div>
           </div>
         </div>
         <div class="stat-list">
-          <div class="stat-row"><span class="k">وثیقه واریزی</span><span class="v" id="statCollateral">—</span></div>
-          <div class="stat-row"><span class="k">بدهی فعلی (USDC)</span><span class="v" id="statDebt">—</span></div>
-          <div class="stat-row"><span class="k">نرخ استریم فعال</span><span class="v" id="statFlow">—</span></div>
-          <div class="stat-row"><span class="k">سقف LTV / قیمت</span><span class="v" id="statLtv">—</span></div>
+          <div class="stat-row"><span class="k">deposit deposit</span><span class="v" id="statCollateral">—</span></div>
+          <div class="stat-row"><span class="k">Current debt (USDC)</span><span class="v" id="statDebt">—</span></div>
+          <div class="stat-row"><span class="k">Active stream rate</span><span class="v" id="statFlow">—</span></div>
+          <div class="stat-row"><span class="k">the ceiling LTV / price</span><span class="v" id="statLtv">—</span></div>
         </div>
       </div>
     </div>
 
     <div class="card" style="animation-delay:.1s">
-      <h3>وضعیت Compliance</h3>
+      <h3>status Compliance</h3>
       <div class="seal-row">
         <div class="seal pending" id="complianceSeal">
-          <div class="tier" id="complianceTierText">نامعلوم</div>
+          <div class="tier" id="complianceTierText">unknown</div>
         </div>
         <div class="stat-list">
           <div class="stat-row"><span class="k">KYC</span><span class="v" id="statKyc">—</span></div>
-          <div class="stat-row"><span class="k">محدودیت (AML)</span><span class="v" id="statRestricted">—</span></div>
-          <div class="stat-row"><span class="k">سقف وام مجاز</span><span class="v" id="statMaxLoan">—</span></div>
+          <div class="stat-row"><span class="k">Limitation (AML)</span><span class="v" id="statRestricted">—</span></div>
+          <div class="stat-row"><span class="k">the ceiling andام مجاز</span><span class="v" id="statMaxLoan">—</span></div>
           <div class="stat-row"><span class="k">Attestation</span><span class="v" id="statAttestation">—</span></div>
         </div>
       </div>
       <div class="row-btns">
-        <button id="btnSelfAttest">Attest خودم (admin/demo)</button>
-        <button id="btnSelfKyc">KYC خودم (admin/demo)</button>
+        <button id="btnSelfAttest">Attest myself (admin/demo)</button>
+        <button id="btnSelfKyc">KYC myself (admin/demo)</button>
       </div>
-      <p class="hint">این دو دکمه فقط برای آدرسی کار می‌کند که نقش attester/officer دارد (معمولاً همان deployer در حالت دمو).</p>
+      <p class="hint">These two buttons only work for an address‌Don't play that role attester/officer has (usually the same deployer In demo mode).</p>
     </div>
   </section>
 
   <section class="grid2">
     <div class="card" style="animation-delay:.15s">
-      <h3>واریز وثیقه و گرفتن وام</h3>
-      <div class="field"><label>مقدار وثیقه (RWA، مثلاً 1)</label><input id="inCollateral" placeholder="1"></div>
-      <div class="field"><label>مقدار وام (USDC، مثلاً 600)</label><input id="inBorrow" placeholder="600"></div>
+      <h3>andاریز collateral and getting a loan</h3>
+      <div class="field"><label>Bail amount (RWA, for example 1)</label><input id="inCollateral" placeholder="1"></div>
+      <div class="field"><label>Loan amount (USDC, for example 600)</label><input id="inBorrow" placeholder="600"></div>
       <div class="field"><label>Attestation ID</label><input id="inAttestationId" placeholder="1"></div>
-      <button class="primary" id="btnDeposit" style="width:100%;">تایید وثیقه + واریز و وام</button>
-      <p class="hint" id="depositHint">ابتدا کیف‌پول را وصل کن.</p>
+      <button class="primary" id="btnDeposit" style="width:100%;">Confirmation of collateral + Deposit and loan</button>
+      <p class="hint" id="depositHint">First the bag‌money را andصل کن.</p>
     </div>
 
     <div class="card" style="animation-delay:.2s">
-      <h3>بازپرداخت و استریم</h3>
-      <div class="field"><label>مقدار بازپرداخت دستی (USDC)</label><input id="inRepay" placeholder="100"></div>
-      <button id="btnRepay" style="width:100%; margin-bottom:14px;">بازپرداخت دستی</button>
-      <div class="field"><label>نرخ استریم (USDC در ثانیه، مثلاً 1)</label><input id="inFlowRate" placeholder="1"></div>
+      <h3>Repay and stream</h3>
+      <div class="field"><label>مقدار Manual refund (USDC)</label><input id="inRepay" placeholder="100"></div>
+      <button id="btnRepay" style="width:100%; margin-bottom:14px;">Manual refund</button>
+      <div class="field"><label>Stream rate (USDC در ثانیه, for example 1)</label><input id="inFlowRate" placeholder="1"></div>
       <div class="row-btns" style="margin-top:0;">
-        <button id="btnStartStream" style="flex:1;">شروع استریم</button>
-        <button id="btnSettleStream" style="flex:1;">تسویه الان</button>
+        <button id="btnStartStream" style="flex:1;">Start streaming</button>
+        <button id="btnSettleStream" style="flex:1;">Settlement now</button>
       </div>
-      <p class="hint">«شروع استریم» به Vault اجازه‌ی نامحدود USDC هم می‌دهد تا «تسویه الان» بتواند خودکار بکشد.</p>
+      <p class="hint">«Start streaming» to Vault permission‌unlimited USDC May too‌to give «Settlement now» can draw automatically.</p>
     </div>
   </section>
 
   <div class="card" style="animation-delay:.25s">
-    <h3>دفتر تراکنش‌های این جلسه</h3>
-    <div id="ledgerEmpty" class="empty-ledger">هنوز تراکنشی در این جلسه ثبت نشده.</div>
+    <h3>دفتر transaction‌of this meeting</h3>
+    <div id="ledgerEmpty" class="empty-ledger">هنandز transactionی در این جلسه ثبت نشده.</div>
     <table class="ledger" id="ledgerTable" style="display:none;">
-      <thead><tr><th>عملیات</th><th>وضعیت</th><th>تراکنش</th></tr></thead>
+      <thead><tr><th>Operation</th><th>status</th><th>transaction</th></tr></thead>
       <tbody id="ledgerBody"></tbody>
     </table>
   </div>
@@ -387,10 +387,10 @@ $('btnSaveConfig').addEventListener('click', async () => {
   };
   try {
     localStorage.setItem(CONFIG_KEY, JSON.stringify(config)); console.log("Config saved:", config);
-    toast('تنظیمات ذخیره شد.');
+    toast('Settings save شد.');
     refreshConfigBanner();
     if (userAddress) refreshAll();
-  } catch (e) { toast('خطا در ذخیره‌ی تنظیمات: ' + e.message); }
+  } catch (e) { toast('error در save‌ی Settings: ' + e.message); }
 });
 
 async function ensureArcNetwork() {
@@ -414,7 +414,7 @@ async function ensureArcNetwork() {
 
 $('btnConnect').addEventListener('click', connectWallet);
 async function connectWallet() {
-  if (!window.ethereum) { toast('کیف‌پولی مثل MetaMask پیدا نشد.'); return; }
+  if (!window.ethereum) { toast('bag‌moneyی مثل MetaMask not found.'); return; }
   try {
     await ensureArcNetwork();
     provider = new ethers.BrowserProvider(window.ethereum);
@@ -423,9 +423,9 @@ async function connectWallet() {
     userAddress = accounts[0];
     $('btnConnect').textContent = userAddress.slice(0, 6) + '…' + userAddress.slice(-4);
     $('netDot').style.background = 'var(--sage)';
-    toast('وصل شد: ' + userAddress);
+    toast('connected: ' + userAddress);
     refreshAll();
-  } catch (e) { toast('خطا در اتصال: ' + (e.shortMessage || e.message)); }
+  } catch (e) { toast('Connection error: ' + (e.shortMessage || e.message)); }
 }
 
 function contracts() {
@@ -473,7 +473,7 @@ async function refreshAll() {
         setRing(health);
       } else { setRing(null); }
     } else {
-      $('statDebt').textContent = '۰ (بدون وام فعال)';
+      $('statDebt').textContent = '0 (no active loan)';
       setRing(null);
     }
 
@@ -482,8 +482,8 @@ async function refreshAll() {
     $('statLtv').textContent = (Number(ltv) / 100) + '% @ ' + fmt(price, USDC_DECIMALS, 0) + ' USDC';
 
     const profile = await compliance.getProfile(userAddress);
-    $('statKyc').textContent = profile.kycVerified ? 'تایید شده ✓' : 'تایید نشده';
-    $('statRestricted').textContent = profile.restricted ? 'محدود شده ⛔' : 'آزاد';
+    $('statKyc').textContent = profile.kycVerified ? 'confirmed ✓' : 'not confirmed';
+    $('statRestricted').textContent = profile.restricted ? 'limited ⛔' : 'free';
     const tierNum = Number(profile.tier);
     const maxLoan = await compliance.maxLoanForTier(tierNum);
     $('statMaxLoan').textContent = fmt(maxLoan, USDC_DECIMALS, 0) + ' USDC';
@@ -491,21 +491,21 @@ async function refreshAll() {
     const seal = $('complianceSeal');
     const eligible = profile.kycVerified && !profile.restricted;
     seal.className = 'seal ' + (eligible ? 'verified' : 'pending');
-    $('complianceTierText').textContent = eligible ? TIER_NAMES[tierNum] || '—' : 'در انتظار';
+    $('complianceTierText').textContent = eligible ? TIER_NAMES[tierNum] || '—' : 'waiting';
 
     $('depositHint').textContent = eligible
-      ? 'وثیقه/وام باید در سقف LTV و سقف tier (' + (TIER_NAMES[tierNum] || '') + ') باشد.'
-      : 'ابتدا باید KYC شوید تا بتوانید وام بگیرید.';
+      ? 'collateral/The loan must be in the ceiling LTV and the ceiling tier (' + (TIER_NAMES[tierNum] || '') + ') be.'
+      : 'First you have to KYC to be able to get a loan.';
 
     const attIdCheck = $('inAttestationId').value.trim();
     if (attIdCheck) {
       const { attestation } = contracts();
       const validAtt = await attestation.isValid(BigInt(attIdCheck), userAddress);
-      $('statAttestation').textContent = validAtt ? ('#' + attIdCheck + ' معتبر ✓') : ('#' + attIdCheck + ' نامعتبر');
+      $('statAttestation').textContent = validAtt ? ('#' + attIdCheck + ' authentic ✓') : ('#' + attIdCheck + ' invalid');
     }
   } catch (e) {
     console.error(e);
-    toast('خطا در خوانده داده‌ها — آدرس قراردادها را در تنظیمات چک کنید.');
+    toast('error در خandانده داده‌I see — Check the address of the contracts in the settings.');
   }
 }
 
@@ -514,33 +514,33 @@ function addLedgerRow(action, status, hash) {
   $('ledgerTable').style.display = 'table';
   const tr = document.createElement('tr');
   const link = hash ? `<a href="${ARC.explorer}/tx/${hash}" target="_blank" rel="noopener">${hash.slice(0,10)}…↗</a>` : '—';
-  const cls = status === 'موفق' ? 'tx-ok' : status === 'ناموفق' ? 'tx-fail' : 'tx-pending';
+  const cls = status === 'successful' ? 'tx-ok' : status === 'ناsuccessful' ? 'tx-fail' : 'tx-pending';
   tr.innerHTML = `<td class="rtl-cell">${action}</td><td class="${cls}">${status}</td><td>${link}</td>`;
   $('ledgerBody').prepend(tr);
   return tr;
 }
 
 async function runTx(label, fn) {
-  const row = addLedgerRow(label, 'در حال ارسال…', null);
+  const row = addLedgerRow(label, 'Sending…', null);
   try {
     const tx = await fn();
-    row.innerHTML = `<td class="rtl-cell">${label}</td><td class="tx-pending">در انتظار تایید…</td><td class="mono">${tx.hash.slice(0,10)}…</td>`;
+    row.innerHTML = `<td class="rtl-cell">${label}</td><td class="tx-pending">Awaiting confirmation…</td><td class="mono">${tx.hash.slice(0,10)}…</td>`;
     const receipt = await tx.wait();
     const ok = receipt.status === 1;
-    row.innerHTML = `<td class="rtl-cell">${label}</td><td class="${ok ? 'tx-ok' : 'tx-fail'}">${ok ? 'موفق' : 'ناموفق'}</td>` +
+    row.innerHTML = `<td class="rtl-cell">${label}</td><td class="${ok ? 'tx-ok' : 'tx-fail'}">${ok ? 'successful' : 'ناsuccessful'}</td>` +
       `<td><a href="${ARC.explorer}/tx/${tx.hash}" target="_blank" rel="noopener">${tx.hash.slice(0,10)}…↗</a></td>`;
-    toast(label + (ok ? ' — موفق ✓' : ' — ناموفق'));
+    toast(label + (ok ? ' — successful ✓' : ' — ناsuccessful'));
     refreshAll();
     return receipt;
   } catch (e) {
-    row.innerHTML = `<td class="rtl-cell">${label}</td><td class="tx-fail">رد شد</td><td>—</td>`;
-    toast('خطا: ' + (e.shortMessage || e.reason || e.message));
+    row.innerHTML = `<td class="rtl-cell">${label}</td><td class="tx-fail">rejected</td><td>—</td>`;
+    toast('error: ' + (e.shortMessage || e.reason || e.message));
     throw e;
   }
 }
 
 $('btnSelfAttest').addEventListener('click', async () => {
-  if (!signer) return toast('اول کیف‌پول را وصل کن.');
+  if (!signer) return toast('اandل bag‌money را andصل کن.');
   const { attestation } = contracts();
   const hash = ethers.keccak256(ethers.toUtf8Bytes('demo-asset-' + Date.now()));
   const receipt = await runTx('Self-attest', () => attestation.attest(userAddress, hash, 31536000n));
@@ -550,7 +550,7 @@ $('btnSelfAttest').addEventListener('click', async () => {
         const parsed = attestation.interface.parseLog(log);
         if (parsed && parsed.name === 'AttestationIssued') {
           $('inAttestationId').value = parsed.args.id.toString();
-          toast('Attestation ID شما: ' + parsed.args.id.toString());
+          toast('Attestation ID you: ' + parsed.args.id.toString());
           refreshAll();
           break;
         }
@@ -560,53 +560,53 @@ $('btnSelfAttest').addEventListener('click', async () => {
 });
 
 $('btnSelfKyc').addEventListener('click', async () => {
-  if (!signer) return toast('اول کیف‌پول را وصل کن.');
+  if (!signer) return toast('اandل bag‌money را andصل کن.');
   const { compliance } = contracts();
   await runTx('Self-KYC (Retail)', () => compliance.setProfile(userAddress, true, 1, 31536000n));
 });
 
 $('btnDeposit').addEventListener('click', async () => {
-  if (!signer) return toast('اول کیف‌پول را وصل کن.');
+  if (!signer) return toast('اandل bag‌money را andصل کن.');
   const collateral = ethers.parseUnits($('inCollateral').value || '0', RWA_DECIMALS);
   const borrow = ethers.parseUnits($('inBorrow').value || '0', USDC_DECIMALS);
   const attId = BigInt($('inAttestationId').value || '0');
-  if (collateral === 0n || borrow === 0n) return toast('مقدار وثیقه و وام را وارد کن.');
+  if (collateral === 0n || borrow === 0n) return toast('Enter the collateral and loan amount.');
   const { rwa, vault } = contracts();
   const allowance = await rwa.allowance(userAddress, config.vault);
   if (allowance < collateral) {
     await runTx('Approve RWA collateral', () => rwa.approve(config.vault, collateral));
   }
-  await runTx('واریز وثیقه + گرفتن وام', () => vault.depositRWAAndBorrow(collateral, borrow, attId));
+  await runTx('andاریز collateral + getting a loan', () => vault.depositRWAAndBorrow(collateral, borrow, attId));
 });
 
 $('btnRepay').addEventListener('click', async () => {
-  if (!signer) return toast('اول کیف‌پول را وصل کن.');
+  if (!signer) return toast('اandل bag‌money را andصل کن.');
   const amount = ethers.parseUnits($('inRepay').value || '0', USDC_DECIMALS);
-  if (amount === 0n) return toast('مقدار بازپرداخت را وارد کن.');
+  if (amount === 0n) return toast('Enter the refund amount.');
   const { usdc, vault } = contracts();
   const allowance = await usdc.allowance(userAddress, config.vault);
   if (allowance < amount) {
     await runTx('Approve USDC', () => usdc.approve(config.vault, amount));
   }
-  await runTx('بازپرداخت دستی', () => vault.repay(amount));
+  await runTx('Manual refund', () => vault.repay(amount));
 });
 
 $('btnStartStream').addEventListener('click', async () => {
-  if (!signer) return toast('اول کیف‌پول را وصل کن.');
+  if (!signer) return toast('اandل bag‌money را andصل کن.');
   const rate = ethers.parseUnits($('inFlowRate').value || '0', USDC_DECIMALS);
-  if (rate === 0n) return toast('نرخ استریم را وارد کن.');
+  if (rate === 0n) return toast('Stream rate را andارد کن.');
   const { usdc, vault } = contracts();
   const allowance = await usdc.allowance(userAddress, config.vault);
   if (allowance < ethers.MaxUint256 / 2n) {
-    await runTx('Approve USDC (نامحدود، برای استریم)', () => usdc.approve(config.vault, ethers.MaxUint256));
+    await runTx('Approve USDC (Unlimited, for streaming)', () => usdc.approve(config.vault, ethers.MaxUint256));
   }
-  await runTx('شروع استریم', () => vault.startSelfPayingStream(rate));
+  await runTx('Start streaming', () => vault.startSelfPayingStream(rate));
 });
 
 $('btnSettleStream').addEventListener('click', async () => {
-  if (!signer) return toast('اول کیف‌پول را وصل کن.');
+  if (!signer) return toast('اandل bag‌money را andصل کن.');
   const { vault } = contracts();
-  await runTx('تسویه استریم', () => vault.settleStream(userAddress));
+  await runTx('Stream settlement', () => vault.settleStream(userAddress));
 });
 
 loadConfig();

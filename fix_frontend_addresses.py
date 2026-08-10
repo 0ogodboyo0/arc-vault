@@ -9,9 +9,9 @@ def run_cmd(cmd):
     res = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
     return res.stdout.strip()
 
-print("📝 ۱. ذخیره مقادیر پیش‌فرض در فایل‌های فرانت‌اند...")
+print("📝 1. Save the previous values‌Assumption in the file‌High Front‌are...")
 
-# ۱. تزریق اسکریپت مقداردهی اولیه در index.html
+# 1. Inject the initialization script index.html
 if os.path.exists("index.html"):
     with open("index.html", "r", encoding="utf-8", errors="ignore") as f:
         html_content = f.read()
@@ -37,9 +37,9 @@ localStorage.setItem('rwaAddress', '{rwa}');
             
         with open("index.html", "w", encoding="utf-8") as f:
             f.write(html_content)
-        print("  • آدرس‌ها با موفقیت در index.html ثبت شدند.")
+        print("  • address‌successfully in index.html were registered.")
 
-# ۲. تزریق متغیرها در تمامی فایل‌های JS
+# 2. Injection of variables in all files‌Hi JS
 for root, dirs, files in os.walk("."):
     for file in files:
         if file.endswith(".js"):
@@ -59,9 +59,9 @@ if (!localStorage.getItem('vaultAddress')) {{
             if "localStorage.setItem('vaultAddress'" not in js_content:
                 with open(file_path, "w", encoding="utf-8") as f:
                     f.write(header + js_content)
-                print(f"  • فایل {file_path} بروزرسانی شد.")
+                print(f"  • file {file_path} Updated.")
 
-print("\n🚀 ۲. ارسال تغییرات به گیت‌هاب...")
+print("\n🚀 2. Submit changes to git‌hub...")
 run_cmd("git add .")
 run_cmd('git commit -m "Fix: Auto load default contract addresses"')
 push_res = run_cmd("git push origin main")

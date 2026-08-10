@@ -8,7 +8,7 @@ pk = "0x5f05eb81bae0844e7d31569d1bac2f0aa730e362d233c2f1c98b188334553fbf"
 def run(cmd):
     return subprocess.run(cmd, shell=True, capture_output=True, text=True).stdout.strip()
 
-print("🔍 ۱. اسکن شبکه و جداسازی قراردادهای واقعی از آدرس‌های نامعتبر...")
+print("🔍 1. Network scanning and separating real contracts from addresses‌invalid...")
 
 candidates = set(["0x7306e00a86a1ceebeb99645ab7c9f5ef019d8751"])
 
@@ -28,23 +28,23 @@ for addr in candidates:
         continue
     code = run(f'cast code {addr} --rpc-url {rpc}')
     if code and code != "0x" and len(code) > 10:
-        print(f"  ✅ قرارداد معتبر روی شبکه یافت شد: {addr}")
+        print(f"  ✅ A valid contract was found on the network: {addr}")
         valid_tokens.add(addr)
 
-amount = "1000000000000000000000000" # ۱,۰۰۰,۰۰۰ توکن
+amount = "1000000000000000000000000" # 1,000,000 tokens
 
-print("\n⚡ ۲. شارژ و صدور مجوز (Approve)...")
+print("\n⚡ 2. Charging and licensing (Approve)...")
 for t in valid_tokens:
-    print(f"   • در حال تنظیم توکن {t}...")
+    print(f"   • Setting token {t}...")
     run(f'cast send {t} "mint(address,uint256)" {user} {amount} --private-key {pk} --rpc-url {rpc}')
     run(f'cast send {t} "mint(address,uint256)" {vault} {amount} --private-key {pk} --rpc-url {rpc}')
     run(f'cast send {t} "approve(address,uint256)" {vault} {amount} --private-key {pk} --rpc-url {rpc}')
 
-print("\n🧪 ۳. تست دریافت وام...")
+print("\n🧪 3. Loan test...")
 res = run(f'cast send {vault} "depositAndBorrow(uint256,uint256,uint256)" 1000000000000000000 1000000000000000000 17 --private-key {pk} --rpc-url {rpc}')
 
 if "status               1" in res or "status               0x1" in res:
-    print("🎉 تراکنش دریافت وام با موفقیت کامل انجام شد!")
+    print("🎉 The loan transaction was completed successfully!")
 else:
-    print("نتیجه تراکنش:")
+    print("Transaction result:")
     print(res)

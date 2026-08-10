@@ -4,16 +4,16 @@ file_path = "index.html"
 with open(file_path, "r", encoding="utf-8") as f:
     html = f.read()
 
-# ۱. اصلاح فراخوانی‌های ذخیره‌سازی به localStorage استاندارد
+# 1. Modify the call‌storage‌making to localStorage Standard
 html = re.sub(r'await\s+window\.storage\.set', 'localStorage.setItem', html)
 html = re.sub(r'await\s+window\.storage\.get', 'localStorage.getItem', html)
 html = re.sub(r'window\.storage\.set', 'localStorage.setItem', html)
 html = re.sub(r'window\.storage\.get', 'localStorage.getItem', html)
 
-# ۲. تزریق تابع اصلاح‌شده ثبت Attestation و واریز وثیقه جهت جلوگیری از خطای Revert
+# 2. Injection correction function‌registered Attestation and depositing a deposit to avoid mistakes Revert
 fix_script = """
 <script>
-// کد اصلاحی برای تعامل با قراردادهای Arc Testnet
+// Fixed code to interact with contracts Arc Testnet
 async function issueAttestFix() {
     try {
         const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -28,12 +28,12 @@ async function issueAttestFix() {
             "0x0000000000000000000000000000000000000000000000000000000000000000",
             1893456000
         );
-        alert("تراکنش ثبت Attestation ارسال شد. لطفاً منتظر تایید بمانید...");
+        alert("Registration transaction Attestation sent Please wait for confirmation...");
         await tx.wait();
-        alert("Attestation با موفقیت ثبت شد!");
+        alert("Attestation Successfully registered!");
         window.location.reload();
     } catch (err) {
-        alert("خطا در ثبت Attestation: " + (err.reason || err.message));
+        alert("Error in registration Attestation: " + (err.reason || err.message));
     }
 }
 </script>
@@ -45,4 +45,4 @@ if "issueAttestFix" not in html:
 with open(file_path, "w", encoding="utf-8") as f:
     f.write(html)
 
-print("فایل index.html با موفقیت ویرایش شد.")
+print("file index.html Edited successfully.")

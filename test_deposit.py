@@ -9,17 +9,17 @@ def run_cmd(cmd):
     res = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
     return res.stdout.strip()
 
-print("📖 ۱. امضای کامل تابع depositRWAAndBorrow:")
+print("📖 1. Full function signature depositRWAAndBorrow:")
 with open("src/SelfPayingVault.sol", "r", encoding="utf-8", errors="ignore") as f:
     lines = f.readlines()
     print("".join(lines[207:235]))
 
-print("\n⚡ ۲. شارژ توکن وثیقه RWA و Approve:")
+print("\n⚡ 2. Charging the collateral token RWA and Approve:")
 rwa = "0x7306e00a86a1ceebeb99645ab7c9f5ef019d8751"
 rwa_amount = "10000000000000000000" # 10 RWA (18 decimals)
 
 run_cmd(f'cast send {rwa} "mint(address,uint256)" {user} {rwa_amount} --private-key {pk} --rpc-url {rpc}')
 run_cmd(f'cast send {rwa} "approve(address,uint256)" {vault} {rwa_amount} --private-key {pk} --rpc-url {rpc}')
 
-print("\n🧪 ۳. تست فراخوانی depositRWAAndBorrow:")
-# استعلام آرگومان‌ها از خطوط چاپ شده بالا انجام می‌شود
+print("\n🧪 3. Recall test depositRWAAndBorrow:")
+# Argument query‌ها از خطandط چاپ شده بالا انجام می‌to be

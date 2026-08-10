@@ -5,12 +5,12 @@ if os.path.exists(path):
     with open(path, "r", encoding="utf-8", errors="ignore") as f:
         lines = f.readlines()
     
-    print("=== ۱. متغیرهای تعریف‌شده در بالای قرارداد ===")
+    print("=== 1. Definition variables‌been on top of the contract ===")
     for i in range(min(50, len(lines))):
         if any(kw in lines[i] for kw in ["IERC20", "address", "uint256", "ISuperfluid", "IRWA"]):
             print(f"Line {i+1}: {lines[i].strip()}")
             
-    print("\n=== ۲. بدنه کامل تابع depositAndBorrow ===")
+    print("\n=== 2. The full body of the function depositAndBorrow ===")
     start = False
     brace_count = 0
     for i, line in enumerate(lines):
@@ -22,4 +22,4 @@ if os.path.exists(path):
             if brace_count == 0 and "function" not in line:
                 break
 else:
-    print("❌ فایل یافت نشد!")
+    print("❌ File not found!")

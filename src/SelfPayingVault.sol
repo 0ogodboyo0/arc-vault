@@ -210,7 +210,7 @@ contract ArcRWASelfPayingVault {
         uint256 usdcBorrowAmount,
         uint64 attestationId
     ) external whenNotPaused nonReentrant {
-        // اگر وام فعال بود، به همان پوزیشن قبلی اضافه می‌شود
+        // If the loan was active, it will be added to the previous position‌to be
         if (loans[msg.sender].isActive) {
             uint256 totalCollateral = loans[msg.sender].collateralAmount + collateralAmount;
             uint256 totalBorrow = loans[msg.sender].principal + usdcBorrowAmount;

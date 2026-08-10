@@ -9,36 +9,36 @@ def run_cmd(cmd):
     res = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
     return res.stdout.strip()
 
-print("🔍 ۱. خواندن آدرس توکن‌های ثبت‌شده مستقیم از داخل قرارداد Vault...")
+print("🔍 ۱. خواندن آدرس token‌registrations‌done directly from within the contract Vault...")
 
-# دریافت آدرس توکن‌ها از روی توابع خواندنی قرارداد
+# دریافت آدرس token‌from the readable functions of the contract
 rwa = run_cmd(f'cast call {vault} "rwaToken()(address)" --rpc-url {rpc}')
 usdc = run_cmd(f'cast call {vault} "usdcToken()(address)" --rpc-url {rpc}')
 asset = run_cmd(f'cast call {vault} "asset()(address)" --rpc-url {rpc}')
 
-print(f"   • توکن RWA: {rwa}")
-print(f"   • توکن USDC: {usdc}")
-print(f"   • توکن Asset: {asset}")
+print(f"   • token RWA: {rwa}")
+print(f"   • token USDC: {usdc}")
+print(f"   • token Asset: {asset}")
 
 tokens = set()
 for t in [rwa, usdc, asset]:
     if t and t.startswith("0x") and len(t) == 42 and t != "0x0000000000000000000000000000000000000000":
         tokens.add(t)
 
-# توکن پیش‌فرض
+# token پیش‌assumption
 tokens.add("0x7306e00a86a1ceebeb99645ab7c9f5ef019d8751")
 
-amount = "1000000000000000000000000" # ۱,۰۰۰,۰۰۰ توکن
+amount = "1000000000000000000000000" # ۱,۰۰۰,۰۰۰ token
 
-print("\n⚡ ۲. شارژ و Approve توکن‌های اصلی...")
+print("\n⚡ 2. charging and Approve token‌The main ones...")
 for t in tokens:
-    print(f"   • در حال تنظیم توکن: {t}")
+    print(f"   • Setting token: {t}")
     run_cmd(f'cast send {t} "mint(address,uint256)" {user} {amount} --private-key {pk} --rpc-url {rpc}')
     run_cmd(f'cast send {t} "mint(address,uint256)" {vault} {amount} --private-key {pk} --rpc-url {rpc}')
     run_cmd(f'cast send {t} "approve(address,uint256)" {vault} {amount} --private-key {pk} --rpc-url {rpc}')
 
-print("\n🧪 ۳. تست اجرای depositAndBorrow...")
+print("\n🧪 3. Implementation test depositAndBorrow...")
 output = run_cmd(f'cast send {vault} "depositAndBorrow(uint256,uint256,uint256)" 1000000000000000000 1000000000000000000 17 --private-key {pk} --rpc-url {rpc}')
 
-print("\n--- خروجی تراکنش شبکه ---")
+print("\n--- Network transaction output ---")
 print(output)

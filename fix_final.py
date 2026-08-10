@@ -17,26 +17,26 @@ def get_bal(addr):
     except:
         return 0
 
-print("🔍 ۱. استعلام موجودی فعلی:")
-print(f"   • موجودی ولت شما: {get_bal(user)} RWA")
-print(f"   • موجودی خزانه Vault: {get_bal(vault)} RWA")
+print("🔍 1. Current inventory inquiry:")
+print(f"   • Your Volt inventory: {get_bal(user)} RWA")
+print(f"   • Treasury balance Vault: {get_bal(vault)} RWA")
 
-print("\n⚡ ۲. در حال واریز توکن‌ها و صدور مجوز...")
-# ساخت توکن برای ولت کاربر
+print("\n⚡ 2. Depositing token‌and licensing...")
+# Creating a token for the user Volt
 run(f'cast send {token} "mint(address,uint256)" {user} 1000000000000000000000000 --private-key {pk} --rpc-url {rpc}')
-# ساخت توکن برای خزانه Vault
+# Making tokens for the treasury Vault
 run(f'cast send {token} "mint(address,uint256)" {vault} 1000000000000000000000000 --private-key {pk} --rpc-url {rpc}')
-# مجوز دسترسی به قرارداد Vault
+# License to access the contract Vault
 run(f'cast send {token} "approve(address,uint256)" {vault} 1000000000000000000000000 --private-key {pk} --rpc-url {rpc}')
 
-print("\n✅ ۳. استعلام موجودی پس از شارژ:")
-print(f"   • موجودی جدید ولت شما: {get_bal(user)} RWA")
-print(f"   • موجودی جدید خزانه Vault: {get_bal(vault)} RWA")
+print("\n✅ 3. Balance inquiry after charging:")
+print(f"   • Your new Volt inventory: {get_bal(user)} RWA")
+print(f"   • The new balance of the treasury Vault: {get_bal(vault)} RWA")
 
-print("\n🧪 ۴. اجرای تست مستقیم واریز و دریافت وام در ترمینال...")
+print("\n🧪 4. Implementation of direct test of deposit and loan receipt in the terminal...")
 tx = run(f'cast send {vault} "depositAndBorrow(uint256,uint256,uint256)" 1000000000000000000 1000000000000000000 17 --private-key {pk} --rpc-url {rpc}')
 if "status               1" in tx or "status               0x1" in tx:
-    print("🎉 تراکنش با موفقیت کامل در بلاکچین ثبت و وام دریافت شد!")
+    print("🎉 The transaction was successfully registered in the blockchain and the loan was received!")
 else:
-    print("نتیجه تراکنش:")
+    print("Transaction result:")
     print(tx)

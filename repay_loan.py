@@ -10,22 +10,22 @@ def run_cmd(cmd):
     res = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
     return res.stdout.strip()
 
-print("🔎 ۱. استعلام میزان بدهی فعلی (اصل + سود accrued)...")
+print("🔎 ۱. استعلام amount of debt فعلی (اصل + profit accrued)...")
 debt_raw = run_cmd(f'cast call {vault} "currentDebt(address)(uint256)" {user} --rpc-url {rpc}')
-print(f"  • میزان بدهی: {debt_raw}")
+print(f"  • amount of debt: {debt_raw}")
 
-# اگر مقدار بدهی دریافت شد، همان مقدار یا بیشتر جهت اطمینان approve می‌شود
+# اگر مقدار بدهی دریافت شد، همان مقدار یا بیشتر جهت اطmayنان approve may‌to be
 debt = int(debt_raw.split()[0]) if debt_raw and debt_raw.split()[0].isdigit() else 1000000
 
-print("\n🔑 ۲. دادن مجوز (Approve) USDC به قرارداد Vault...")
+print("\n🔑 2. giving permission (Approve) USDC to contract Vault...")
 run_cmd(f'cast send {usdc} "approve(address,uint256)" {vault} {debt} --private-key {pk} --rpc-url {rpc}')
 
-print("\n💸 ۳. اجرای تابع تسویه وام (repay)...")
+print("\n💸 3. Implementation of the loan settlement function (repay)...")
 res = run_cmd(f'cast send {vault} "repay(uint256)" {debt} --private-key {pk} --rpc-url {rpc}')
 
-print("\n--- خروجی تراکنش تسویه ---")
+print("\n--- Settlement transaction output ---")
 print(res)
 
-print("\n🔍 ۴. استعلام مجدد وضعیت وام:")
+print("\n🔍 4. Query the status of the loan again:")
 loan_status = run_cmd(f'cast call {vault} "getLoan(address)((uint256,uint256,uint64,uint64,int96,bool))" {user} --rpc-url {rpc}')
-print(f"  • وضعیت فعلی: {loan_status}")
+print(f"  • current situation: {loan_status}")
