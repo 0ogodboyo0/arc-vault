@@ -197,7 +197,7 @@ localStorage.setItem('rwaAddress', '0x7306e00a86a1ceebeb99645ab7c9f5ef019d8751')
     </div>
     <div class="topbar-right">
       <span class="badge"><span class="dot" id="netDot"></span><span id="netLabel">Arc Testnet</span></span>
-      <button id="btnConnect" class="primary"> bag‌money</button>
+      <button id="btnConnect" class="primary">Connect Wallet</button>
     </div>
   </header>
 
@@ -214,7 +214,7 @@ localStorage.setItem('rwaAddress', '0x7306e00a86a1ceebeb99645ab7c9f5ef019d8751')
       <div class="field"><label>MockRWAToken (Bail test)</label><input id="cfgRwa" value="0x7306e00a86a1ceebeb99645ab7c9f5ef019d8751" placeholder="0x..."></div>
     </div>
     <button class="primary" id="btnSaveConfig">save</button>
-    <p class="hint">This address‌I see    and and  you save ‌become.</p>
+    <p class="hint" id="depositHint">First connect your wallet.</p>
   </details>
 
   <section class="hero">
@@ -259,7 +259,7 @@ localStorage.setItem('rwaAddress', '0x7306e00a86a1ceebeb99645ab7c9f5ef019d8751')
         <button id="btnSelfAttest">Attest myself (admin/demo)</button>
         <button id="btnSelfKyc">KYC myself (admin/demo)</button>
       </div>
-      <p class="hint">These two buttons only work for an address‌Don't play that role attester/officer has (usually the same deployer In demo mode).</p>
+      <p class="hint" id="depositHint">First connect your wallet.</p>
     </div>
   </section>
 
@@ -270,7 +270,7 @@ localStorage.setItem('rwaAddress', '0x7306e00a86a1ceebeb99645ab7c9f5ef019d8751')
       <div class="field"><label>Loan amount (USDC, for example 600)</label><input id="inBorrow" placeholder="600"></div>
       <div class="field"><label>Attestation ID</label><input id="inAttestationId" placeholder="1"></div>
       <button class="primary" id="btnDeposit" style="width:100%;">Confirmation of collateral + Deposit and loan</button>
-      <p class="hint" id="depositHint">First the bag‌money  and .</p>
+      <p class="hint" id="depositHint">First connect your wallet.</p>
     </div>
 
     <div class="card" style="animation-delay:.2s">
@@ -282,7 +282,7 @@ localStorage.setItem('rwaAddress', '0x7306e00a86a1ceebeb99645ab7c9f5ef019d8751')
         <button id="btnStartStream" style="flex:1;">Start streaming</button>
         <button id="btnSettleStream" style="flex:1;">Settlement now</button>
       </div>
-      <p class="hint">«Start streaming» to Vault permission‌unlimited USDC May too‌to give «Settlement now» can draw automatically.</p>
+      <p class="hint" id="depositHint">First connect your wallet.</p>
     </div>
   </section>
 
