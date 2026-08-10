@@ -69,7 +69,6 @@ Full write-up of what worked, what didn't, and recommendations: [`CIRCLE_PRODUCT
 Full beginner-to-deployed walkthrough (including a mobile/Termux path) is in
 [`GETTING_STARTED.md`](./GETTING_STARTED.md). Quick version if you already have Foundry:
 
-```bash
 git clone https://github.com/0ogodboyo0/arc-vault.git
 cd arc-vault
 forge install foundry-rs/forge-std
@@ -78,9 +77,7 @@ forge test -vvv          # 11 passed, 0 failed
 
 cp .env.example .env     # fill in PRIVATE_KEY
 source .env
-forge script script/Deploy.s.sol:DeployScript \
-  --rpc-url https://rpc.testnet.arc.network --broadcast --private-key $PRIVATE_KEY
-```
+forge script script/Deploy.s.sol:DeployScript --rpc-url https://rpc.testnet.arc.network --broadcast --private-key $PRIVATE_KEY
 
 After deploying, fund the vault's own address with USDC (it pays out loans from its own
 balance) and open `index.html` — paste the four deployed addresses into its Settings panel.
