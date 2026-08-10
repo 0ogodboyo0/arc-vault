@@ -8,7 +8,7 @@ user = "0x99fd2d64e7c59697dd001189e5c4d970320cca44"
 # token‌identifications‌done
 tokens = set(["0x7306e00a86a1ceebeb99645ab7c9f5ef019d8751"])
 
-# خواندن حافظه قرارداد جهت یافتن آدرس token‌Other possibilities (eg USDC)
+#       token‌Other possibilities (eg USDC)
 for slot in range(10):
     cmd = f"cast storage {vault} {slot} --rpc-url {rpc}"
     res = subprocess.run(cmd, shell=True, capture_output=True, text=True).stdout.strip()
@@ -19,7 +19,7 @@ for slot in range(10):
 
 amount = "10000000000000000000000000" # 10 million tokens
 
-print(f"🔍 token‌found‌done در قرارداد Vault: {tokens}")
+print(f"🔍 token‌found‌done   Vault: {tokens}")
 
 for t in tokens:
     print(f"\n⚡ Charging and setting the token {t}...")

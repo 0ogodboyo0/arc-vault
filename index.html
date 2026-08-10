@@ -159,9 +159,9 @@ async function issueAttestFix() {
             "0x0000000000000000000000000000000000000000000000000000000000000000",
             1893456000
         );
-        alert("transaction ثبت Attestation sent Please wait for confirmation...");
+        alert("transaction  Attestation sent Please wait for confirmation...");
         await tx.wait();
-        alert("Attestation با successfulیت ثبت شد!");
+        alert("Attestation  successful  !");
         window.location.reload();
     } catch (err) {
         alert("Error in registration Attestation: " + (err.reason || err.message));
@@ -197,7 +197,7 @@ localStorage.setItem('rwaAddress', '0x7306e00a86a1ceebeb99645ab7c9f5ef019d8751')
     </div>
     <div class="topbar-right">
       <span class="badge"><span class="dot" id="netDot"></span><span id="netLabel">Arc Testnet</span></span>
-      <button id="btnConnect" class="primary">اتصال bag‌money</button>
+      <button id="btnConnect" class="primary"> bag‌money</button>
     </div>
   </header>
 
@@ -206,7 +206,7 @@ localStorage.setItem('rwaAddress', '0x7306e00a86a1ceebeb99645ab7c9f5ef019d8751')
   </div>
 
   <details class="settings" id="settingsBox">
-    <summary>⚙ Settings — آدرس قراردادI see</summary>
+    <summary>⚙ Settings —  I see</summary>
     <div class="grid2">
       <div class="field"><label>ArcRWASelfPayingVault</label><input id="cfgVault" value="0x6f29286af2134afce4619038a2cd7a48666449d7" placeholder="0x..."></div>
       <div class="field"><label>AttestationRegistry</label><input id="cfgAttestation" value="0xE49151151A55a84909e581066233de33f4d0f396" placeholder="0x..."></div>
@@ -214,7 +214,7 @@ localStorage.setItem('rwaAddress', '0x7306e00a86a1ceebeb99645ab7c9f5ef019d8751')
       <div class="field"><label>MockRWAToken (Bail test)</label><input id="cfgRwa" value="0x7306e00a86a1ceebeb99645ab7c9f5ef019d8751" placeholder="0x..."></div>
     </div>
     <button class="primary" id="btnSaveConfig">save</button>
-    <p class="hint">This address‌I see فقط در همین مرandرگر and برای you save می‌become.</p>
+    <p class="hint">This address‌I see    and and  you save ‌become.</p>
   </details>
 
   <section class="hero">
@@ -251,7 +251,7 @@ localStorage.setItem('rwaAddress', '0x7306e00a86a1ceebeb99645ab7c9f5ef019d8751')
         <div class="stat-list">
           <div class="stat-row"><span class="k">KYC</span><span class="v" id="statKyc">—</span></div>
           <div class="stat-row"><span class="k">Limitation (AML)</span><span class="v" id="statRestricted">—</span></div>
-          <div class="stat-row"><span class="k">the ceiling andام مجاز</span><span class="v" id="statMaxLoan">—</span></div>
+          <div class="stat-row"><span class="k">the ceiling and </span><span class="v" id="statMaxLoan">—</span></div>
           <div class="stat-row"><span class="k">Attestation</span><span class="v" id="statAttestation">—</span></div>
         </div>
       </div>
@@ -265,19 +265,19 @@ localStorage.setItem('rwaAddress', '0x7306e00a86a1ceebeb99645ab7c9f5ef019d8751')
 
   <section class="grid2">
     <div class="card" style="animation-delay:.15s">
-      <h3>andاریز collateral and getting a loan</h3>
+      <h3>and collateral and getting a loan</h3>
       <div class="field"><label>Bail amount (RWA, for example 1)</label><input id="inCollateral" placeholder="1"></div>
       <div class="field"><label>Loan amount (USDC, for example 600)</label><input id="inBorrow" placeholder="600"></div>
       <div class="field"><label>Attestation ID</label><input id="inAttestationId" placeholder="1"></div>
       <button class="primary" id="btnDeposit" style="width:100%;">Confirmation of collateral + Deposit and loan</button>
-      <p class="hint" id="depositHint">First the bag‌money را andصل کن.</p>
+      <p class="hint" id="depositHint">First the bag‌money  and .</p>
     </div>
 
     <div class="card" style="animation-delay:.2s">
       <h3>Repay and stream</h3>
-      <div class="field"><label>مقدار Manual refund (USDC)</label><input id="inRepay" placeholder="100"></div>
+      <div class="field"><label> Manual refund (USDC)</label><input id="inRepay" placeholder="100"></div>
       <button id="btnRepay" style="width:100%; margin-bottom:14px;">Manual refund</button>
-      <div class="field"><label>Stream rate (USDC در ثانیه, for example 1)</label><input id="inFlowRate" placeholder="1"></div>
+      <div class="field"><label>Stream rate (USDC  , for example 1)</label><input id="inFlowRate" placeholder="1"></div>
       <div class="row-btns" style="margin-top:0;">
         <button id="btnStartStream" style="flex:1;">Start streaming</button>
         <button id="btnSettleStream" style="flex:1;">Settlement now</button>
@@ -287,8 +287,8 @@ localStorage.setItem('rwaAddress', '0x7306e00a86a1ceebeb99645ab7c9f5ef019d8751')
   </section>
 
   <div class="card" style="animation-delay:.25s">
-    <h3>دفتر transaction‌of this meeting</h3>
-    <div id="ledgerEmpty" class="empty-ledger">هنandز transactionی در این جلسه ثبت نشده.</div>
+    <h3> transaction‌of this meeting</h3>
+    <div id="ledgerEmpty" class="empty-ledger">and transaction     .</div>
     <table class="ledger" id="ledgerTable" style="display:none;">
       <thead><tr><th>Operation</th><th>status</th><th>transaction</th></tr></thead>
       <tbody id="ledgerBody"></tbody>
@@ -387,10 +387,10 @@ $('btnSaveConfig').addEventListener('click', async () => {
   };
   try {
     localStorage.setItem(CONFIG_KEY, JSON.stringify(config)); console.log("Config saved:", config);
-    toast('Settings save شد.');
+    toast('Settings save .');
     refreshConfigBanner();
     if (userAddress) refreshAll();
-  } catch (e) { toast('error در save‌ی Settings: ' + e.message); }
+  } catch (e) { toast('error  save‌ Settings: ' + e.message); }
 });
 
 async function ensureArcNetwork() {
@@ -414,7 +414,7 @@ async function ensureArcNetwork() {
 
 $('btnConnect').addEventListener('click', connectWallet);
 async function connectWallet() {
-  if (!window.ethereum) { toast('bag‌moneyی مثل MetaMask not found.'); return; }
+  if (!window.ethereum) { toast('MetaMask not found.'); return; }
   try {
     await ensureArcNetwork();
     provider = new ethers.BrowserProvider(window.ethereum);
@@ -505,7 +505,7 @@ async function refreshAll() {
     }
   } catch (e) {
     console.error(e);
-    toast('error در خandانده داده‌I see — Check the address of the contracts in the settings.');
+    toast('error  and ‌I see — Check the address of the contracts in the settings.');
   }
 }
 
@@ -514,7 +514,7 @@ function addLedgerRow(action, status, hash) {
   $('ledgerTable').style.display = 'table';
   const tr = document.createElement('tr');
   const link = hash ? `<a href="${ARC.explorer}/tx/${hash}" target="_blank" rel="noopener">${hash.slice(0,10)}…↗</a>` : '—';
-  const cls = status === 'successful' ? 'tx-ok' : status === 'ناsuccessful' ? 'tx-fail' : 'tx-pending';
+  const cls = status === 'successful' ? 'tx-ok' : status === 'successful' ? 'tx-fail' : 'tx-pending';
   tr.innerHTML = `<td class="rtl-cell">${action}</td><td class="${cls}">${status}</td><td>${link}</td>`;
   $('ledgerBody').prepend(tr);
   return tr;
@@ -527,9 +527,9 @@ async function runTx(label, fn) {
     row.innerHTML = `<td class="rtl-cell">${label}</td><td class="tx-pending">Awaiting confirmation…</td><td class="mono">${tx.hash.slice(0,10)}…</td>`;
     const receipt = await tx.wait();
     const ok = receipt.status === 1;
-    row.innerHTML = `<td class="rtl-cell">${label}</td><td class="${ok ? 'tx-ok' : 'tx-fail'}">${ok ? 'successful' : 'ناsuccessful'}</td>` +
+    row.innerHTML = `<td class="rtl-cell">${label}</td><td class="${ok ? 'tx-ok' : 'tx-fail'}">${ok ? 'successful' : 'successful'}</td>` +
       `<td><a href="${ARC.explorer}/tx/${tx.hash}" target="_blank" rel="noopener">${tx.hash.slice(0,10)}…↗</a></td>`;
-    toast(label + (ok ? ' — successful ✓' : ' — ناsuccessful'));
+    toast(label + (ok ? ' — successful ✓' : ' — successful'));
     refreshAll();
     return receipt;
   } catch (e) {
@@ -540,7 +540,7 @@ async function runTx(label, fn) {
 }
 
 $('btnSelfAttest').addEventListener('click', async () => {
-  if (!signer) return toast('اandل bag‌money را andصل کن.');
+  if (!signer) return toast('and bag‌money  and .');
   const { attestation } = contracts();
   const hash = ethers.keccak256(ethers.toUtf8Bytes('demo-asset-' + Date.now()));
   const receipt = await runTx('Self-attest', () => attestation.attest(userAddress, hash, 31536000n));
@@ -560,13 +560,13 @@ $('btnSelfAttest').addEventListener('click', async () => {
 });
 
 $('btnSelfKyc').addEventListener('click', async () => {
-  if (!signer) return toast('اandل bag‌money را andصل کن.');
+  if (!signer) return toast('and bag‌money  and .');
   const { compliance } = contracts();
   await runTx('Self-KYC (Retail)', () => compliance.setProfile(userAddress, true, 1, 31536000n));
 });
 
 $('btnDeposit').addEventListener('click', async () => {
-  if (!signer) return toast('اandل bag‌money را andصل کن.');
+  if (!signer) return toast('and bag‌money  and .');
   const collateral = ethers.parseUnits($('inCollateral').value || '0', RWA_DECIMALS);
   const borrow = ethers.parseUnits($('inBorrow').value || '0', USDC_DECIMALS);
   const attId = BigInt($('inAttestationId').value || '0');
@@ -576,11 +576,11 @@ $('btnDeposit').addEventListener('click', async () => {
   if (allowance < collateral) {
     await runTx('Approve RWA collateral', () => rwa.approve(config.vault, collateral));
   }
-  await runTx('andاریز collateral + getting a loan', () => vault.depositRWAAndBorrow(collateral, borrow, attId));
+  await runTx('and collateral + getting a loan', () => vault.depositRWAAndBorrow(collateral, borrow, attId));
 });
 
 $('btnRepay').addEventListener('click', async () => {
-  if (!signer) return toast('اandل bag‌money را andصل کن.');
+  if (!signer) return toast('and bag‌money  and .');
   const amount = ethers.parseUnits($('inRepay').value || '0', USDC_DECIMALS);
   if (amount === 0n) return toast('Enter the refund amount.');
   const { usdc, vault } = contracts();
@@ -592,9 +592,9 @@ $('btnRepay').addEventListener('click', async () => {
 });
 
 $('btnStartStream').addEventListener('click', async () => {
-  if (!signer) return toast('اandل bag‌money را andصل کن.');
+  if (!signer) return toast('and bag‌money  and .');
   const rate = ethers.parseUnits($('inFlowRate').value || '0', USDC_DECIMALS);
-  if (rate === 0n) return toast('Stream rate را andارد کن.');
+  if (rate === 0n) return toast('Stream rate  and .');
   const { usdc, vault } = contracts();
   const allowance = await usdc.allowance(userAddress, config.vault);
   if (allowance < ethers.MaxUint256 / 2n) {
@@ -604,7 +604,7 @@ $('btnStartStream').addEventListener('click', async () => {
 });
 
 $('btnSettleStream').addEventListener('click', async () => {
-  if (!signer) return toast('اandل bag‌money را andصل کن.');
+  if (!signer) return toast('and bag‌money  and .');
   const { vault } = contracts();
   await runTx('Stream settlement', () => vault.settleStream(userAddress));
 });

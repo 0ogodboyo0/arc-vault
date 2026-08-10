@@ -10,21 +10,21 @@ def run_cmd(cmd):
     res = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
     return res.stdout.strip()
 
-print("🔎 1. استخراج address token USDC From the contract Vault:")
+print("🔎 1.  address token USDC From the contract Vault:")
 usdc_addr = run_cmd(f'cast call {vault} "usdc()(address)" --rpc-url {rpc}')
 print(f"  • address USDC: {usdc_addr}")
 
 print("\n⚡ 2. Cash charge USDC self Vault and charging/Approve token RWA user:")
-# شارژ 1,۰۰۰ USDC (6 decimal places) to itself Vault To secure a loan
+#  1, USDC (6 decimal places) to itself Vault To secure a loan
 run_cmd(f'cast send {usdc_addr} "mint(address,uint256)" {vault} 1000000000 --private-key {pk} --rpc-url {rpc}')
 
-# شارژ 1۰ token RWA (1۸ رقم اعشار) to user و دادن Approve to Vault
+#  1 token RWA (1  ) to user   Approve to Vault
 rwa_amount = "10000000000000000000" # 10 RWA
 run_cmd(f'cast send {rwa} "mint(address,uint256)" {user} {rwa_amount} --private-key {pk} --rpc-url {rpc}')
 run_cmd(f'cast send {rwa} "approve(address,uint256)" {vault} {rwa_amount} --private-key {pk} --rpc-url {rpc}')
 
 print("\n🚀 3. Send transaction depositRWAAndBorrow...")
-# 1۰ RWA collateral | 1 USDC loan (1_000_000) | ID Attestation: 17
+# 1 RWA collateral | 1 USDC loan (1_000_000) | ID Attestation: 17
 cmd = f'cast send {vault} "depositRWAAndBorrow(uint256,uint256,uint64)" {rwa_amount} 1000000 17 --private-key {pk} --rpc-url {rpc}'
 res = run_cmd(cmd)
 

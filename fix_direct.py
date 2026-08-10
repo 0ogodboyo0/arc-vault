@@ -9,9 +9,9 @@ def run_cmd(cmd):
     res = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
     return res.stdout.strip()
 
-print("🔍 ۱. خواندن آدرس token‌registrations‌done directly from within the contract Vault...")
+print("🔍 .   token‌registrations‌done directly from within the contract Vault...")
 
-# دریافت آدرس token‌from the readable functions of the contract
+#   token‌from the readable functions of the contract
 rwa = run_cmd(f'cast call {vault} "rwaToken()(address)" --rpc-url {rpc}')
 usdc = run_cmd(f'cast call {vault} "usdcToken()(address)" --rpc-url {rpc}')
 asset = run_cmd(f'cast call {vault} "asset()(address)" --rpc-url {rpc}')
@@ -25,10 +25,10 @@ for t in [rwa, usdc, asset]:
     if t and t.startswith("0x") and len(t) == 42 and t != "0x0000000000000000000000000000000000000000":
         tokens.add(t)
 
-# token پیش‌assumption
+# token ‌assumption
 tokens.add("0x7306e00a86a1ceebeb99645ab7c9f5ef019d8751")
 
-amount = "1000000000000000000000000" # ۱,۰۰۰,۰۰۰ token
+amount = "1000000000000000000000000" # ,, token
 
 print("\n⚡ 2. charging and Approve token‌The main ones...")
 for t in tokens:

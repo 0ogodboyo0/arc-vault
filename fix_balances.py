@@ -11,7 +11,7 @@ def run_cmd(cmd):
     res = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
     return res.stdout.strip()
 
-print("🔍 ۱. استعلام inventory‌I see:")
+print("🔍 .  inventory‌I see:")
 user_usdc = run_cmd(f'cast call {usdc} "balanceOf(address)(uint256)" {user} --rpc-url {rpc}')
 vault_usdc = run_cmd(f'cast call {usdc} "balanceOf(address)(uint256)" {vault} --rpc-url {rpc}')
 user_rwa = run_cmd(f'cast call {rwa} "balanceOf(address)(uint256)" {user} --rpc-url {rpc}')
@@ -20,16 +20,16 @@ print(f"  • inventory USDC user: {user_usdc}")
 print(f"  • inventory USDC volt (Vault): {vault_usdc}")
 print(f"  • inventory RWA user: {user_rwa}")
 
-# اگر user USDC دارد، بخشی از آن را مستقیم to Vault deposit‌to ensure the liquidity of the loan
+#  user USDC       to Vault deposit‌to ensure the liquidity of the loan
 try:
     u_bal = int(user_usdc.split()[0])
     if u_bal >= 1000000:
         print("\n💸 2. Transfer 1 USDC to Vault To provide liquidity for loan payments...")
         run_cmd(f'cast send {usdc} "transfer(address,uint256)" {vault} 1000000 --private-key {pk} --rpc-url {rpc}')
     else:
-        print("\n⚠️ inventory USDC user برای شارژ Vault not enough.")
+        print("\n⚠️ inventory USDC user   Vault not enough.")
 except Exception as e:
-    print(f"خطا در پردازش inventory: {e}")
+    print(f"   inventory: {e}")
 
 print("\n🚀 3. Retry execution depositRWAAndBorrow...")
 rwa_amount = "10000000000000000000" # 10 RWA

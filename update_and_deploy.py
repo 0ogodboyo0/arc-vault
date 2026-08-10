@@ -2,13 +2,13 @@ import subprocess, re
 
 path = "src/SelfPayingVault.sol"
 
-# ۱. خواندن و اصلاح منطق شرط loan فعال
+# .      loan 
 with open(path, "r", encoding="utf-8") as f:
     code = f.read()
 
 # condition replacement Revert With the logic of increasing bail/loan
 old_check = 'require(!loans[msg.sender].isActive, "active loan exists");'
-new_logic = '''// اگر loan فعال بود، به همان پوزیشن قبلی اضافه می‌to be
+new_logic = '''//  loan        ‌to be
         if (loans[msg.sender].isActive) {
             uint256 totalCollateral = loans[msg.sender].collateralAmount + collateralAmount;
             uint256 totalBorrow = loans[msg.sender].principal + usdcBorrowAmount;

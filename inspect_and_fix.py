@@ -26,7 +26,7 @@ for root, dirs, files in os.walk("."):
                             print("\n".join(lines[i:min(len(lines), i+30)]))
                             break
 
-print("\n🔍 ۲. استعلام آدرس token‌from the contract Vault...")
+print("\n🔍 .   token‌from the contract Vault...")
 getters = ["rwaToken", "usdcToken", "rwa", "usdc", "asset"]
 tokens = set()
 

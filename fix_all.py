@@ -13,7 +13,7 @@ print("🔍 Scanning the project and extracting the token address‌I see...")
 
 found_addresses = set(["0x7306e00a86a1ceebeb99645ab7c9f5ef019d8751"])
 
-# 1. Extract all addresses‌I seeی token از فایل‌I seeی پروژه
+# 1. Extract all addresses‌I see token  ‌I see 
 for f_path in glob.glob("**/*.*", recursive=True):
     if f_path.endswith((".sol", ".js", ".html", ".json")):
         try:
@@ -32,7 +32,7 @@ for g in getters:
     cmd = 'cast call ' + vault + ' "' + sig + '" --rpc-url ' + rpc
     res = run(cmd)
     if res and res.startswith("0x") and len(res) == 42 and res != "0x0000000000000000000000000000000000000000":
-        print("✅ token پیدا شد (" + g + "): " + res)
+        print("✅ token   (" + g + "): " + res)
         found_addresses.add(res)
 
 amount = "1000000000000000000000000" # 1,000,000 tokens
@@ -47,4 +47,4 @@ for addr in found_addresses:
         run(cmd_vault)
         print("✔️ token " + addr + " for the treasury Vault charged.")
 
-print("\n🎉 تمام token‌I see با موفقیت chargedند.")
+print("\n🎉  token‌I see   charged.")

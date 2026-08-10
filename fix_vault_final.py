@@ -27,10 +27,10 @@ usdc_addr = ""
 for root, dirs, files in os.walk("."):
     for f in files:
         if "MockUSDC" in f:
-            # سعی در استخراج address یا ساخت تandکن
+            #    address   and
             pass
 
-# استعلام address تandکن RWA and USDC From the contract
+#  address and RWA and USDC From the contract
 rwa = run_cmd(f'cast call {vault} "rwaToken()(address)" --rpc-url {rpc}')
 usdc = run_cmd(f'cast call {vault} "usdcToken()(address)" --rpc-url {rpc}')
 
@@ -53,7 +53,7 @@ if usdc.startswith("0x") and len(usdc) == 42 and usdc != "0x00000000000000000000
     run_cmd(f'cast send {usdc} "mint(address,uint256)" {user} {amount} --private-key {pk} --rpc-url {rpc}')
     run_cmd(f'cast send {usdc} "approve(address,uint256)" {vault} {amount} --private-key {pk} --rpc-url {rpc}')
 
-# همچنین شارژ تandکن RWA for yourself Vault
+#   and RWA for yourself Vault
 run_cmd(f'cast send {rwa} "mint(address,uint256)" {vault} {amount} --private-key {pk} --rpc-url {rpc}')
 
 print("\n🧪 4. Implementation and receipt of loans...")

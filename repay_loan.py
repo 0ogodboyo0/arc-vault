@@ -10,11 +10,11 @@ def run_cmd(cmd):
     res = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
     return res.stdout.strip()
 
-print("🔎 ۱. استعلام amount of debt فعلی (اصل + profit accrued)...")
+print("🔎 .  amount of debt  ( + profit accrued)...")
 debt_raw = run_cmd(f'cast call {vault} "currentDebt(address)(uint256)" {user} --rpc-url {rpc}')
 print(f"  • amount of debt: {debt_raw}")
 
-# اگر مقدار بدهی دریافت شد، همان مقدار یا بیشتر جهت اطmayنان approve may‌to be
+#           may approve may‌to be
 debt = int(debt_raw.split()[0]) if debt_raw and debt_raw.split()[0].isdigit() else 1000000
 
 print("\n🔑 2. giving permission (Approve) USDC to contract Vault...")

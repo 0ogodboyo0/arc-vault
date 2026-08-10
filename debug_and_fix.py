@@ -8,7 +8,7 @@ pk = "0x5f05eb81bae0844e7d31569d1bac2f0aa730e362d233c2f1c98b188334553fbf"
 def run(cmd):
     return subprocess.run(cmd, shell=True, capture_output=True, text=True).stdout.strip()
 
-print("🔍 1. Address extraction‌I seeی token از فایل‌I seeی پروژه...")
+print("🔍 1. Address extraction‌I see token  ‌I see ...")
 tokens = set(["0x7306e00a86a1ceebeb99645ab7c9f5ef019d8751"])
 
 for f in glob.glob("**/*.sol", recursive=True):
@@ -23,9 +23,9 @@ for f in glob.glob("**/*.sol", recursive=True):
         except Exception:
             pass
 
-print(f"token‌I seeی پیدا شده: {tokens}")
+print(f"token‌I see  : {tokens}")
 
-amount_18 = "1000000000000000000000000" # ۱,۰۰۰,۰۰۰ token
+amount_18 = "1000000000000000000000000" # ,, token
 
 print("\n⚡ 2. Charging and licensing (Approve) For all tokens‌I see...")
 for token in tokens:

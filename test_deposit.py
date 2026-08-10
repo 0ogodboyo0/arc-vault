@@ -22,4 +22,4 @@ run_cmd(f'cast send {rwa} "mint(address,uint256)" {user} {rwa_amount} --private-
 run_cmd(f'cast send {rwa} "approve(address,uint256)" {vault} {rwa_amount} --private-key {pk} --rpc-url {rpc}')
 
 print("\n🧪 3. Recall test depositRWAAndBorrow:")
-# Argument query‌ها از خطandط چاپ شده بالا انجام می‌to be
+# Argument query‌  and     ‌to be
