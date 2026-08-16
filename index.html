@@ -193,6 +193,77 @@ localStorage.setItem('complianceAddress', '0x28b0fe105D3A936eA72791d5730991df8A0
 localStorage.setItem('rwaAddress', '0x7306e00a86a1ceebeb99645ab7c9f5ef019d8751');
 </script>
 
+
+<style id="aave-v3-theme">
+  :root {
+    --bg-main: #0d0e15 !important;
+    --bg-card: #171924 !important;
+    --bg-card-hover: #1e2030 !important;
+    --border-color: #2b2d3f !important;
+    --text-primary: #f2f4f8 !important;
+    --text-secondary: #8e9bba !important;
+    --accent-purple: #b6509e !important;
+    --accent-cyan: #2ebac6 !important;
+    --accent-gold: #e3c878 !important;
+  }
+
+  body {
+    background-color: var(--bg-main) !important;
+    color: var(--text-primary) !important;
+    font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif !important;
+  }
+
+  /* Aave Style Cards & Panels */
+  .card, .panel, section, div[style*="background"] {
+    background-color: var(--bg-card) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4) !important;
+  }
+
+  /* Headings & Text */
+  h1, h2, h3, h4, strong {
+    color: var(--text-primary) !important;
+    letter-spacing: -0.02em !important;
+  }
+
+  p, span, label {
+    color: var(--text-secondary);
+  }
+
+  /* Aave Style Buttons */
+  button {
+    background: linear-gradient(90deg, #b6509e 0%, #2ebac6 100%) !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 10px !important;
+    font-weight: 600 !important;
+    padding: 10px 18px !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease-in-out !important;
+  }
+
+  button:hover {
+    opacity: 0.9 !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 12px rgba(182, 80, 158, 0.3) !important;
+  }
+
+  /* Inputs & Fields */
+  input, select, textarea {
+    background-color: #0d0e15 !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 10px !important;
+    color: #fff !important;
+    padding: 10px !important;
+  }
+
+  input:focus {
+    border-color: var(--accent-cyan) !important;
+    outline: none !important;
+  }
+</style>
+
 </head>
 <body>
 
