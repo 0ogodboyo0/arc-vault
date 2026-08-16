@@ -194,17 +194,18 @@ localStorage.setItem('rwaAddress', '0x7306e00a86a1ceebeb99645ab7c9f5ef019d8751')
 </script>
 
 
-<style id="aave-v3-theme">
+
+<style id="arc-vault-custom-theme">
   :root {
-    --bg-main: #0d0e15 !important;
-    --bg-card: #171924 !important;
-    --bg-card-hover: #1e2030 !important;
-    --border-color: #2b2d3f !important;
-    --text-primary: #f2f4f8 !important;
-    --text-secondary: #8e9bba !important;
-    --accent-purple: #b6509e !important;
-    --accent-cyan: #2ebac6 !important;
-    --accent-gold: #e3c878 !important;
+    --bg-main: #0b0e1a !important;
+    --bg-card: #141a2e !important;
+    --bg-card-hover: #1c243f !important;
+    --border-color: #2a3358 !important;
+    --text-primary: #f5f7fa !important;
+    --text-secondary: #8c99b2 !important;
+    --accent-arc-gold: #c9a54e !important;
+    --accent-arc-soft: #e3c878 !important;
+    --accent-arc-glow: rgba(201, 165, 78, 0.3) !important;
   }
 
   body {
@@ -213,12 +214,12 @@ localStorage.setItem('rwaAddress', '0x7306e00a86a1ceebeb99645ab7c9f5ef019d8751')
     font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif !important;
   }
 
-  /* Aave Style Cards & Panels */
+  /* Arc RWA Custom Cards */
   .card, .panel, section, div[style*="background"] {
     background-color: var(--bg-card) !important;
     border: 1px solid var(--border-color) !important;
-    border-radius: 16px !important;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4) !important;
+    border-radius: 14px !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5) !important;
   }
 
   /* Headings & Text */
@@ -231,27 +232,27 @@ localStorage.setItem('rwaAddress', '0x7306e00a86a1ceebeb99645ab7c9f5ef019d8751')
     color: var(--text-secondary);
   }
 
-  /* Aave Style Buttons */
+  /* Arc Gold Custom Buttons */
   button {
-    background: linear-gradient(90deg, #b6509e 0%, #2ebac6 100%) !important;
-    color: #ffffff !important;
+    background: linear-gradient(135deg, #c9a54e 0%, #9e7d30 100%) !important;
+    color: #0b0e1a !important;
     border: none !important;
     border-radius: 10px !important;
-    font-weight: 600 !important;
+    font-weight: 700 !important;
     padding: 10px 18px !important;
     cursor: pointer !important;
     transition: all 0.2s ease-in-out !important;
   }
 
   button:hover {
-    opacity: 0.9 !important;
+    background: linear-gradient(135deg, #e3c878 0%, #c9a54e 100%) !important;
     transform: translateY(-1px) !important;
-    box-shadow: 0 4px 12px rgba(182, 80, 158, 0.3) !important;
+    box-shadow: 0 4px 14px var(--accent-arc-glow) !important;
   }
 
-  /* Inputs & Fields */
+  /* Inputs & Focus Glow */
   input, select, textarea {
-    background-color: #0d0e15 !important;
+    background-color: #0b0e1a !important;
     border: 1px solid var(--border-color) !important;
     border-radius: 10px !important;
     color: #fff !important;
@@ -259,10 +260,12 @@ localStorage.setItem('rwaAddress', '0x7306e00a86a1ceebeb99645ab7c9f5ef019d8751')
   }
 
   input:focus {
-    border-color: var(--accent-cyan) !important;
+    border-color: var(--accent-arc-gold) !important;
     outline: none !important;
+    box-shadow: 0 0 8px var(--accent-arc-glow) !important;
   }
 </style>
+
 
 </head>
 <body>
