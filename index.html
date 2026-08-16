@@ -302,6 +302,64 @@ localStorage.setItem('rwaAddress', '0x7306e00a86a1ceebeb99645ab7c9f5ef019d8751')
   }
 </style>
 
+
+<style id="arc-vault-pro-features">
+  /* Toast Notification Styling */
+  #toast-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .arc-toast {
+    background: #141a2e;
+    border: 1px solid #c9a54e;
+    color: #fff;
+    padding: 12px 18px;
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    animation: slideIn 0.3s ease-out;
+  }
+  @keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+
+  /* RWA Badge & Specs */
+  .badge-verified {
+    background: rgba(46, 186, 198, 0.15);
+    color: #2ebac6;
+    border: 1px solid #2ebac6;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: bold;
+  }
+  .rwa-spec-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 10px;
+    margin-top: 10px;
+    font-size: 12px;
+  }
+  .rwa-spec-item {
+    background: #0b0e1a;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid #2a3358;
+  }
+</style>
+
+<!-- Toast Container -->
+<div id="toast-container"></div>
+
 </head>
 <body>
 
@@ -788,6 +846,57 @@ window.addEventListener('DOMContentLoaded', function() {
     setTimeout(fillAndSave, 300);
     setTimeout(fillAndSave, 1000);
 });
+</script>
+
+
+<script id="arc-vault-pro-js">
+  // Self-Paying Yield Calculator
+  function updatePayoffSimulation() {
+    const deposit = parseFloat(document.getElementById("sim-deposit")?.value || 10000);
+    const debt = parseFloat(document.getElementById("sim-debt")?.value || 6000);
+    const apy = parseFloat(document.getElementById("sim-apy")?.value || 8.5);
+    
+    const annualYield = deposit * (apy / 100);
+    const monthsToPayoff = annualYield > 0 ? ((debt / annualYield) * 12).toFixed(1) : 0;
+    
+    document.getElementById("sim-res-yield").innerText = "$" + annualYield.toFixed(2) + " / yr";
+    document.getElementById("sim-res-months").innerText = monthsToPayoff + " Months";
+  }
+
+  // Toast Notification System
+  function showArcScanToast(txHash, msg) {
+    const container = document.getElementById("toast-container");
+    const toast = document.createElement("div");
+    toast.className = "arc-toast";
+    toast.innerHTML = `
+      <span>✅ ${msg}</span>
+      ${txHash ? `<a href="https://testnet.arcscan.io/tx/${txHash}" target="_blank" style="color:#c9a54e; text-decoration:underline;">View on ArcScan</a>` : ""}
+    `;
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 5000);
+  }
+
+  // Download Vault Financial Statement
+  function downloadStatement() {
+    const statement = {
+      protocol: "ArcRWA Self-Paying Vault",
+      network: "Arc Testnet (5042002)",
+      timestamp: new Date().toISOString(),
+      compliance: "AML Cleared / Accredited Tier 1",
+      collateralAsset: "MockRWAToken (US T-Bills)",
+      collateralValue: "10,000 USD",
+      currentDebt: "600 USD",
+      healthFactor: "1200.00x",
+      status: "Active - Self-Paying Yield Stream"
+    };
+    const blob = new Blob([JSON.stringify(statement, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "Arc_Vault_Statement.json";
+    a.click();
+    showArcScanToast(null, "Financial statement downloaded!");
+  }
 </script>
 
 </body>
