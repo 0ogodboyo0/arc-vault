@@ -394,6 +394,45 @@ localStorage.setItem('rwaAddress', '0x7306e00a86a1ceebeb99645ab7c9f5ef019d8751')
   }
 </style>
 
+
+<style id="arc-vault-v4-institutional">
+  /* Global Protocol Metrics Banner */
+  .metrics-banner {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 12px;
+    margin: 15px 0 20px 0;
+  }
+  .metric-card {
+    background: #141a2e;
+    border: 1px solid #2a3358;
+    border-radius: 12px;
+    padding: 12px;
+    text-align: center;
+  }
+  .metric-title { font-size: 11px; color: #8c99b2; text-transform: uppercase; letter-spacing: 0.5px; }
+  .metric-value { font-size: 16px; font-weight: bold; color: #c9a54e; margin-top: 4px; }
+
+  /* RainbowKit Style Wallet Drawer Modal */
+  #wallet-drawer {
+    position: fixed; top: 0; right: -360px; width: 310px; height: 100%;
+    background: #0b0e1a; border-left: 1px solid #2a3358;
+    box-shadow: -10px 0 30px rgba(0,0,0,0.85); z-index: 10000;
+    transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1); padding: 22px;
+    box-sizing: border-box;
+  }
+  #wallet-drawer.open { right: 0; }
+  .drawer-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.65); display: none; z-index: 9999;
+    backdrop-filter: blur(3px);
+  }
+
+  /* Risk & Liquidation Bar */
+  .risk-bar-bg { background: #0b0e1a; height: 10px; border-radius: 5px; overflow: hidden; margin-top: 8px; border: 1px solid #2a3358; }
+  .risk-bar-fill { height: 100%; width: 88%; background: linear-gradient(90deg, #ff5252 0%, #e3c878 40%, #2ebac6 100%); }
+</style>
+
 </head>
 <body>
 
@@ -561,6 +600,25 @@ localStorage.setItem('rwaAddress', '0x7306e00a86a1ceebeb99645ab7c9f5ef019d8751')
   <div class="ticker-box">
     <span>⚡ Auto Yield Stream Active: </span>
     <span id="live-stream-ticker">+$0.000000 USDC Repaid</span>
+  </div>
+</div>
+
+
+<div class="card" style="margin: 15px 0; padding: 15px; background: #141a2e; border: 1px solid #2a3358; border-radius: 14px;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+    <h4 style="margin: 0; color: #f5f7fa; font-size: 13px;">📊 Yield Revenue Breakdown & Liquidation Buffer</h4>
+    <span style="font-size:11px; color:#2ebac6; font-weight:bold;">Safe Zone 🛡️</span>
+  </div>
+  <div style="display: flex; justify-content: space-between; font-size: 12px; color: #8c99b2; background:#0b0e1a; padding:8px; border-radius:8px; margin-bottom:10px;">
+    <span>U.S. T-Bills Base: <strong style="color:#fff;">5.2% APY</strong></span>
+    <span>Arc Staking Bonus: <strong style="color:#c9a54e;">+3.3% APY</strong></span>
+    <span>Net APY: <strong style="color:#2ebac6;">8.5%</strong></span>
+  </div>
+  <div style="font-size: 11px; color: #8c99b2;">Liquidation Health Gauge (Buffer to Liquidation Threshold):</div>
+  <div class="risk-bar-bg"><div class="risk-bar-fill"></div></div>
+  <div style="display: flex; justify-content: space-between; font-size: 10px; color: #8c99b2; margin-top: 4px;">
+    <span style="color:#ff5252;">Liquidation Threshold (100%)</span>
+    <span style="color:#2ebac6;">Current Health (1200.00x)</span>
   </div>
 </div>
 
@@ -1012,6 +1070,21 @@ window.addEventListener('DOMContentLoaded', function() {
   }
 
   window.addEventListener("load", checkArcNetwork);
+</script>
+
+
+<script id="arc-vault-v4-js">
+  function toggleWalletDrawer() {
+    const drawer = document.getElementById("wallet-drawer");
+    const overlay = document.getElementById("drawer-overlay");
+    if (drawer.classList.contains("open")) {
+      drawer.classList.remove("open");
+      overlay.style.display = "none";
+    } else {
+      drawer.classList.add("open");
+      overlay.style.display = "block";
+    }
+  }
 </script>
 
 </body>
