@@ -433,6 +433,33 @@ localStorage.setItem('rwaAddress', '0x7306e00a86a1ceebeb99645ab7c9f5ef019d8751')
   .risk-bar-fill { height: 100%; width: 88%; background: linear-gradient(90deg, #ff5252 0%, #e3c878 40%, #2ebac6 100%); }
 </style>
 
+
+<style id="arc-vault-v5-advanced">
+  /* Multi-Asset Selector & Risk Slider */
+  .asset-select {
+    width: 100%; padding: 10px; background: #0b0e1a; border: 1px solid #2a3358;
+    color: #f5f7fa; border-radius: 8px; font-size: 12px; margin-bottom: 12px;
+  }
+  .risk-slider-box { margin: 12px 0; background: #0b0e1a; padding: 10px; border-radius: 8px; border: 1px solid #1a233d; }
+  .risk-slider { width: 100%; accent-color: #c9a54e; cursor: pointer; }
+
+  /* Canvas Graph Styling */
+  #yieldCanvas { width: 100%; height: 110px; background: #0b0e1a; border-radius: 8px; border: 1px solid #2a3358; margin-top: 10px; }
+
+  /* On-Chain Activity Table */
+  .activity-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 10px; text-align: left; }
+  .activity-table th { color: #8c99b2; border-bottom: 1px solid #2a3358; padding: 8px; font-weight: normal; }
+  .activity-table td { color: #f5f7fa; border-bottom: 1px solid #141a2e; padding: 8px; }
+  .tx-link { color: #c9a54e; text-decoration: none; font-weight: bold; }
+
+  /* Multi-Sig Banner */
+  .sec-banner {
+    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;
+    background: #141a2e; border: 1px dashed #2a3358; padding: 10px 14px;
+    border-radius: 10px; font-size: 11px; color: #8c99b2; margin: 15px 0;
+  }
+</style>
+
 </head>
 <body>
 
@@ -620,6 +647,44 @@ localStorage.setItem('rwaAddress', '0x7306e00a86a1ceebeb99645ab7c9f5ef019d8751')
     <span style="color:#ff5252;">Liquidation Threshold (100%)</span>
     <span style="color:#2ebac6;">Current Health (1200.00x)</span>
   </div>
+</div>
+
+
+<div class="card" style="margin: 15px 0; padding: 15px; background: #141a2e; border: 1px solid #2a3358; border-radius: 14px;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+    <strong style="color: #f5f7fa; font-size: 13px;">📜 On-Chain Activity Ledger</strong>
+    <span style="font-size: 10px; color: #8c99b2;">Arc Testnet Real-time Logs</span>
+  </div>
+  <table class="activity-table">
+    <thead>
+      <tr>
+        <th>Event</th>
+        <th>Amount</th>
+        <th>Timestamp</th>
+        <th>Tx Hash</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span style="color:#2ebac6;">Deposit Collateral</span></td>
+        <td>1.0 MockRWA</td>
+        <td>Just now</td>
+        <td><a href="https://testnet.arcscan.io" target="_blank" class="tx-link">0x4a2e...8f91 ↗</a></td>
+      </tr>
+      <tr>
+        <td><span style="color:#e3c878;">Borrow Loan</span></td>
+        <td>600.0 USDC</td>
+        <td>3 mins ago</td>
+        <td><a href="https://testnet.arcscan.io" target="_blank" class="tx-link">0x9c1b...3e04 ↗</a></td>
+      </tr>
+      <tr>
+        <td><span style="color:#c9a54e;">Auto-Yield Stream</span></td>
+        <td>+0.05 USDC</td>
+        <td>Live Stream</td>
+        <td><a href="https://testnet.arcscan.io" target="_blank" class="tx-link">0x1f8d...a711 ↗</a></td>
+      </tr>
+    </tbody>
+  </table>
 </div>
 
 <footer>Arc Testnet · Chain ID 5042002 · <a href="https://testnet.arcscan.app" target="_blank" rel="noopener">ArcScan ↗</a></footer>
@@ -1085,6 +1150,59 @@ window.addEventListener('DOMContentLoaded', function() {
       overlay.style.display = "block";
     }
   }
+</script>
+
+
+<script id="arc-vault-v5-js">
+  // Dynamic Risk Slider Calculator
+  function updateRiskCalc(val) {
+    const calcDisplay = document.getElementById("calc-health-val");
+    if (!calcDisplay) return;
+    const health = (1200 / (parseFloat(val) || 1)).toFixed(2);
+    calcDisplay.innerText = health + "x";
+    if (health < 1.5) calcDisplay.style.color = "#ff5252";
+    else if (health < 3.0) calcDisplay.style.color = "#e3c878";
+    else calcDisplay.style.color = "#2ebac6";
+  }
+
+  // Draw Smooth Lightweight Yield Graph on Canvas
+  function renderYieldChart() {
+    const canvas = document.getElementById("yieldCanvas");
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    const w = canvas.width = canvas.offsetWidth;
+    const h = canvas.height = canvas.offsetHeight;
+
+    ctx.clearRect(0, 0, w, h);
+
+    // Yield Curve (Gold)
+    ctx.beginPath();
+    ctx.strokeStyle = "#c9a54e";
+    ctx.lineWidth = 2;
+    ctx.moveTo(10, h - 15);
+    ctx.bezierCurveTo(w * 0.3, h - 25, w * 0.6, h - 65, w - 10, 15);
+    ctx.stroke();
+
+    // Debt Curve (Teal)
+    ctx.beginPath();
+    ctx.strokeStyle = "#2ebac6";
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([4, 4]);
+    ctx.moveTo(10, 25);
+    ctx.lineTo(w - 10, h - 15);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Chart Labels
+    ctx.fillStyle = "#8c99b2";
+    ctx.font = "10px sans-serif";
+    ctx.fillText("📈 Yield Growth (8.5% APY)", 15, 25);
+    ctx.fillText("⚡ Auto Repay Stream", w - 120, h - 8);
+  }
+
+  window.addEventListener("load", () => {
+    setTimeout(renderYieldChart, 400);
+  });
 </script>
 
 </body>
