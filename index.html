@@ -267,6 +267,41 @@ localStorage.setItem('rwaAddress', '0x7306e00a86a1ceebeb99645ab7c9f5ef019d8751')
 </style>
 
 
+
+<style id="arc-vault-micro-ui">
+  /* Card Hover Lift & Glow Effect */
+  .card, .panel, section, div[style*="background: #141a2e"] {
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s ease, border-color 0.25s ease !important;
+  }
+  .card:hover, .panel:hover, section:hover {
+    transform: translateY(-3px) !important;
+    border-color: rgba(201, 165, 78, 0.45) !important;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.65), 0 0 12px rgba(201, 165, 78, 0.15) !important;
+  }
+
+  /* Shimmer Animation for Progress Bars */
+  div[style*="height: 10px"], .progress-bar {
+    position: relative;
+    overflow: hidden;
+  }
+  div[style*="height: 10px"]::after, .progress-bar::after {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(227, 200, 120, 0.25), transparent);
+    animation: shimmer 2.2s infinite;
+  }
+  @keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+
+  /* Smooth Inputs & Button Click Scale */
+  button:active {
+    transform: scale(0.97) !important;
+  }
+</style>
+
 </head>
 <body>
 
