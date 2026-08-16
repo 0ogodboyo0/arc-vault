@@ -141,6 +141,17 @@
     box-shadow: 0 8px 24px rgba(0,0,0,.4);
   }
   footer { text-align: center; color: var(--muted); font-size: 11.5px; margin-top: 30px; }
+
+/* Auto-injected Vault UX Styles */
+.stepper { display: flex; justify-content: space-between; margin: 20px 0; padding: 15px; background: var(--panel); border-radius: var(--radius); border: 1px solid var(--line); }
+.step { flex: 1; text-align: center; font-size: 12px; color: var(--muted); position: relative; }
+.step.active { color: var(--brass-soft); font-weight: bold; }
+.step-num { width: 24px; height: 24px; border-radius: 50%; background: var(--panel-2); margin: 0 auto 5px; display: flex; align-items: center; justify-content: center; }
+.step.active .step-num { background: var(--brass); color: var(--ink); }
+.repayment-tracker { background: var(--panel-2); padding: 15px; border-radius: var(--radius); margin-top: 15px; border: 1px solid var(--line); }
+.progress-bar { width: 100%; height: 10px; background: #2a3358; border-radius: 5px; overflow: hidden; margin: 10px 0; }
+.progress-fill { height: 100%; background: var(--sage); width: 0%; transition: width 0.5s ease; }
+
 </style>
 
 <script>
@@ -211,7 +222,7 @@ localStorage.setItem('rwaAddress', '0x7306e00a86a1ceebeb99645ab7c9f5ef019d8751')
       <div class="field"><label>ArcRWASelfPayingVault</label><input id="cfgVault" value="0x6f29286af2134afce4619038a2cd7a48666449d7" placeholder="0x..."></div>
       <div class="field"><label>AttestationRegistry</label><input id="cfgAttestation" value="0xE49151151A55a84909e581066233de33f4d0f396" placeholder="0x..."></div>
       <div class="field"><label>ComplianceRegistry</label><input id="cfgCompliance" value="0x28b0fe105D3A936eA72791d5730991df8A0e6863" placeholder="0x..."></div>
-      <div class="field"><label>MockRWAToken (Bail test)</label><input id="cfgRwa" value="0x7306e00a86a1ceebeb99645ab7c9f5ef019d8751" placeholder="0x..."></div>
+      <div class="field"><label>MockRWAToken (RWA Collateral)</label><input id="cfgRwa" value="0x7306e00a86a1ceebeb99645ab7c9f5ef019d8751" placeholder="0x..."></div>
     </div>
     <button class="primary" id="btnSaveConfig">save</button>
     <p class="hint" id="depositHint">First connect your wallet.</p>
@@ -266,7 +277,7 @@ localStorage.setItem('rwaAddress', '0x7306e00a86a1ceebeb99645ab7c9f5ef019d8751')
   <section class="grid2">
     <div class="card" style="animation-delay:.15s">
       <h3>and collateral and getting a loan</h3>
-      <div class="field"><label>Bail amount (RWA, for example 1)</label><input id="inCollateral" placeholder="1"></div>
+      <div class="field"><label>Collateral Deposit (RWA, for example 1)</label><input id="inCollateral" placeholder="1"></div>
       <div class="field"><label>Loan amount (USDC, for example 600)</label><input id="inBorrow" placeholder="600"></div>
       <div class="field"><label>Attestation ID</label><input id="inAttestationId" placeholder="1"></div>
       <button class="primary" id="btnDeposit" style="width:100%;">Confirmation of collateral + Deposit and loan</button>
