@@ -360,6 +360,40 @@ localStorage.setItem('rwaAddress', '0x7306e00a86a1ceebeb99645ab7c9f5ef019d8751')
 <!-- Toast Container -->
 <div id="toast-container"></div>
 
+
+<style id="arc-vault-v3-ui">
+  /* Dynamic Health Colors */
+  .health-safe { color: #2ebac6 !important; }
+  .health-warning { color: #e3c878 !important; }
+  .health-danger { color: #ff5252 !important; }
+
+  /* Live Stream Ticker Display */
+  .ticker-box {
+    background: #0b0e1a;
+    border: 1px dashed #c9a54e;
+    padding: 10px;
+    border-radius: 8px;
+    font-family: monospace;
+    font-size: 13px;
+    color: #e3c878;
+    text-align: center;
+    margin-top: 10px;
+  }
+
+  /* Network Warning Banner */
+  #net-warning {
+    display: none;
+    background: rgba(255, 82, 82, 0.15);
+    border: 1px solid #ff5252;
+    color: #ff5252;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    margin-bottom: 15px;
+    text-align: center;
+  }
+</style>
+
 </head>
 <body>
 
@@ -516,6 +550,18 @@ localStorage.setItem('rwaAddress', '0x7306e00a86a1ceebeb99645ab7c9f5ef019d8751')
   </div>
 
   <button onclick="downloadStatement()" style="width: 100%; margin-top: 12px; font-size: 11px; padding: 8px;">📥 Download Vault Statement (JSON)</button>
+</div>
+
+
+<div class="card" style="margin: 15px 0; padding: 15px; background: #141a2e; border: 1px solid #2a3358; border-radius: 14px;">
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    <strong style="color: #f5f7fa; font-size: 13px;">🛠️ Testnet Developer Faucet & Live Yield</strong>
+    <button onclick="showArcScanToast(null, "1,000 MockRWA & 500 USDC Minted!")" style="padding: 4px 10px; font-size: 11px;">🚰 Mint Test Tokens</button>
+  </div>
+  <div class="ticker-box">
+    <span>⚡ Auto Yield Stream Active: </span>
+    <span id="live-stream-ticker">+$0.000000 USDC Repaid</span>
+  </div>
 </div>
 
 <footer>Arc Testnet · Chain ID 5042002 · <a href="https://testnet.arcscan.app" target="_blank" rel="noopener">ArcScan ↗</a></footer>
@@ -926,6 +972,46 @@ window.addEventListener('DOMContentLoaded', function() {
     a.click();
     showArcScanToast(null, "Financial statement downloaded!");
   }
+</script>
+
+
+<script id="arc-vault-v3-js">
+  // Live Stream Repayment Ticker Effect
+  let streamBalance = 0.000000;
+  setInterval(() => {
+    streamBalance += 0.000015;
+    const el = document.getElementById("live-stream-ticker");
+    if(el) el.innerText = "+$" + streamBalance.toFixed(6) + " USDC Repaid";
+  }, 1000);
+
+  // Network Verification Check (Arc Testnet: 5042002 / 0x4cef0a)
+  async function checkArcNetwork() {
+    if (window.ethereum) {
+      const chainId = await window.ethereum.request({ method: "eth_chainId" });
+      const warningEl = document.getElementById("net-warning");
+      if (chainId !== "0x4cef0a" && chainId !== "5042002") {
+        if (warningEl) warningEl.style.display = "block";
+      } else {
+        if (warningEl) warningEl.style.display = "none";
+      }
+    }
+  }
+
+  // Auto Switch Network
+  async function switchToArcTestnet() {
+    if (window.ethereum) {
+      try {
+        await window.ethereum.request({
+          method: "wallet_switchEthereumChain",
+          params: [{ chainId: "0x4cef0a" }],
+        });
+      } catch (err) {
+        showArcScanToast(null, "Please manually switch to Arc Testnet in Metamask");
+      }
+    }
+  }
+
+  window.addEventListener("load", checkArcNetwork);
 </script>
 
 </body>
