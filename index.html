@@ -1,6 +1,6 @@
 
 <!DOCTYPE html>
-<html lang="fa" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -28,7 +28,7 @@
   }
   html, body {
     margin: 0; background: var(--ink); color: var(--parchment);
-    font-family: 'IBM Plex Sans', sans-serif; direction: rtl;
+    font-family: 'IBM Plex Sans', sans-serif; direction: ltr;
     min-height: 100vh;
   }
   .mono { font-family: 'IBM Plex Mono', monospace; direction: ltr; text-align: left; unicode-bidi: isolate; }
@@ -128,7 +128,7 @@
   table.ledger { width: 100%; border-collapse: collapse; font-size: 12.5px; }
   table.ledger th { text-align: right; color: var(--muted); font-weight: 500; padding: 8px 6px; border-bottom: 1px solid var(--line); }
   table.ledger td { padding: 9px 6px; border-bottom: 1px solid #1c2440; font-family: 'IBM Plex Mono', monospace; direction: ltr; text-align: left; }
-  table.ledger td.rtl-cell { direction: rtl; text-align: right; font-family: 'IBM Plex Sans', sans-serif; }
+  table.ledger td.rtl-cell { direction: ltr; text-align: right; font-family: 'IBM Plex Sans', sans-serif; }
   .tx-ok { color: var(--sage); }
   .tx-fail { color: var(--brick); }
   .tx-pending { color: var(--brass-soft); }
@@ -228,7 +228,23 @@ localStorage.setItem('rwaAddress', '0x7306e00a86a1ceebeb99645ab7c9f5ef019d8751')
     <p class="hint" id="depositHint">First connect your wallet.</p>
   </details>
 
-  <section class="hero">
+  
+<div style="display: flex; justify-content: space-between; margin: 15px 0; padding: 12px; background: #1b2340; border-radius: 12px; border: 1px solid #2a3358; color: #fff; font-family: sans-serif;">
+  <div style="text-align: center; flex: 1; font-size: 11px; color: #e3c878; font-weight: bold;">
+    <div style="width: 22px; height: 22px; background: #c9a54e; color: #0b0e1a; border-radius: 50%; margin: 0 auto 4px; line-height: 22px; font-size: 11px;">1</div>Connect & KYC
+  </div>
+  <div style="text-align: center; flex: 1; font-size: 11px; color: #8891ab;">
+    <div style="width: 22px; height: 22px; background: #2a3358; color: #8891ab; border-radius: 50%; margin: 0 auto 4px; line-height: 22px; font-size: 11px;">2</div>Deposit Collateral
+  </div>
+  <div style="text-align: center; flex: 1; font-size: 11px; color: #8891ab;">
+    <div style="width: 22px; height: 22px; background: #2a3358; color: #8891ab; border-radius: 50%; margin: 0 auto 4px; line-height: 22px; font-size: 11px;">3</div>Borrow USDC
+  </div>
+  <div style="text-align: center; flex: 1; font-size: 11px; color: #8891ab;">
+    <div style="width: 22px; height: 22px; background: #2a3358; color: #8891ab; border-radius: 50%; margin: 0 auto 4px; line-height: 22px; font-size: 11px;">4</div>Auto Repay Stream
+  </div>
+</div>
+
+<section class="hero">
     <div class="card" style="animation-delay:.05s">
       <h3>Collateral and debt status</h3>
       <div class="ring-row">
