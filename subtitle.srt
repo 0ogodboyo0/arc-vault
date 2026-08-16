@@ -1,0 +1,139 @@
+1
+00:00:00,000 --> 00:00:04,500
+Welcome! Today, I’m excited to introduce Arc-Vault—
+
+2
+00:00:04,501 --> 00:00:09,000
+a self-repaying, RWA-collateralized USDC lending protocol with embedded compliance
+
+3
+00:00:09,001 --> 00:00:13,500
+built natively for the Arc Testnet as part of The Stablecoins Commerce Stack Challenge.
+
+4
+00:00:14,000 --> 00:00:18,500
+Traditional DeFi lending protocols face two major bottlenecks when dealing with tokenized real-world assets:
+
+5
+00:00:18,501 --> 00:00:22,500
+rigid manual repayment structures and disconnected off-chain compliance checks.
+
+6
+00:00:23,000 --> 00:00:25,000
+Arc-Vault solves both.
+
+7
+00:00:25,001 --> 00:00:30,000
+By embedding compliance directly into smart contracts and utilizing continuous streams for repayment,
+
+8
+00:00:30,001 --> 00:00:35,000
+borrowers can lock tokenized assets as collateral, draw USDC liquidity, and repay automatically over time.
+
+9
+00:00:45,000 --> 00:00:48,000
+Let's look at the contract architecture under the hood.
+
+10
+00:00:48,001 --> 00:00:52,500
+Instead of relying on unverified off-chain tooling, Arc-Vault implements native smart contract primitives on Arc Testnet:
+
+11
+00:00:53,000 --> 00:00:58,000
+AttestationRegistry.sol issues on-chain proofs verifying asset ownership and control with revocation support.
+
+12
+00:00:58,500 --> 00:01:03,000
+ComplianceRegistry.sol enforces KYC, AML, and investor accreditation limits on every action.
+
+13
+00:01:03,500 --> 00:01:09,000
+SelfPayingVault.sol manages RWA collateral deposits, USDC borrowing, and automated yield settlement.
+
+14
+00:01:10,000 --> 00:01:14,500
+Arc Testnet leverages native USDC as gas, making borrow and settlement operations completely seamless
+
+15
+00:01:14,501 --> 00:01:18,000
+without requiring secondary gas tokens for transactions.
+
+16
+00:01:30,000 --> 00:01:33,000
+Now let's walk through the live decentralized application.
+
+17
+00:01:33,500 --> 00:01:37,000
+First, we connect our wallet via MetaMask to the Arc Testnet.
+
+18
+00:01:37,500 --> 00:01:42,500
+Before performing any financial action, our identity and accreditation tier must be verified on-chain.
+
+19
+00:01:43,000 --> 00:01:46,500
+I click Attest Myself to trigger an on-chain attestation.
+
+20
+00:01:47,000 --> 00:01:52,000
+Once confirmed, our compliance status instantly updates to verified retail tier with designated credit limits.
+
+21
+00:02:00,000 --> 00:02:04,500
+In the deposit panel, we set 1 tRWA as collateral and request a 0.5 USDC loan against it.
+
+22
+00:02:05,000 --> 00:02:10,000
+We click Confirmation of collateral + Deposit and loan and authorize the transaction through MetaMask.
+
+23
+00:02:11,000 --> 00:02:13,500
+Within seconds, the transaction confirms.
+
+24
+00:02:13,501 --> 00:02:19,000
+The protocol verifies our LTV ceiling, locks the tokenized collateral, mints the loan, and updates our vault health dynamically.
+
+25
+00:03:30,000 --> 00:03:33,500
+We can verify the state transition directly on the ArcScan Block Explorer.
+
+26
+00:03:34,000 --> 00:03:38,500
+As shown in transaction details, the smart contract executed depositRWAAndBorrow in under half a second.
+
+27
+00:03:39,000 --> 00:03:44,500
+1 tRWA was deposited into the vault, and 0.5 USDC was immediately transferred directly to the borrower's wallet.
+
+28
+00:03:45,000 --> 00:03:50,000
+Every decision—from compliance verification to collateral ratio auditing—is permanently logged on-chain,
+
+29
+00:03:50,001 --> 00:03:54,000
+offering a fully transparent and auditable trail for institutional compliance.
+
+30
+00:04:15,000 --> 00:04:20,500
+Arc-Vault also integrates Circle’s Programmable Wallets SDK at the architecture level to streamline user onboarding and wallet management.
+
+31
+00:04:21,000 --> 00:04:24,000
+Looking at our system flowchart: users connect through a lightweight frontend
+
+32
+00:04:24,001 --> 00:04:27,500
+that interacts with the Circle SDK to sign transactions seamlessly.
+
+33
+00:04:28,000 --> 00:04:32,500
+These signatures invoke the core Arc-Vault smart contracts, which automatically direct yield strategies
+
+34
+00:04:32,501 --> 00:04:35,500
+to service active loan debts continuous-style.
+
+35
+00:04:36,000 --> 00:04:39,000
+Thank you for watching! Check out the full source code and live demo links in the repository below.
