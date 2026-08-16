@@ -460,6 +460,50 @@ localStorage.setItem('rwaAddress', '0x7306e00a86a1ceebeb99645ab7c9f5ef019d8751')
   }
 </style>
 
+
+<style id="arc-vault-full-ui">
+  .metrics-banner {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 12px;
+    margin: 15px 0 20px 0;
+  }
+  .metric-card {
+    background: #141a2e; border: 1px solid #2a3358;
+    border-radius: 12px; padding: 12px; text-align: center;
+  }
+  .metric-title { font-size: 11px; color: #8c99b2; text-transform: uppercase; letter-spacing: 0.5px; }
+  .metric-value { font-size: 16px; font-weight: bold; color: #c9a54e; margin-top: 4px; }
+
+  /* Wallet Drawer Modal (RainbowKit Style) */
+  #wallet-drawer {
+    position: fixed; top: 0; right: -360px; width: 320px; height: 100%;
+    background: #0b0e1a; border-left: 1px solid #2a3358;
+    box-shadow: -10px 0 30px rgba(0,0,0,0.85); z-index: 10000;
+    transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1); padding: 22px;
+    box-sizing: border-box;
+  }
+  #wallet-drawer.open { right: 0; }
+  .drawer-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.65); display: none; z-index: 9999;
+    backdrop-filter: blur(3px);
+  }
+
+  .risk-bar-bg { background: #0b0e1a; height: 10px; border-radius: 5px; overflow: hidden; margin-top: 8px; border: 1px solid #2a3358; }
+  .risk-bar-fill { height: 100%; width: 88%; background: linear-gradient(90deg, #ff5252 0%, #e3c878 40%, #2ebac6 100%); }
+  #yieldCanvas { width: 100%; height: 110px; background: #0b0e1a; border-radius: 8px; border: 1px solid #2a3358; margin-top: 10px; }
+  .activity-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 10px; text-align: left; }
+  .activity-table th { color: #8c99b2; border-bottom: 1px solid #2a3358; padding: 8px; font-weight: normal; }
+  .activity-table td { color: #f5f7fa; border-bottom: 1px solid #141a2e; padding: 8px; }
+  .tx-link { color: #c9a54e; text-decoration: none; font-weight: bold; }
+  .sec-banner {
+    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;
+    background: #141a2e; border: 1px dashed #2a3358; padding: 10px 14px;
+    border-radius: 10px; font-size: 11px; color: #8c99b2; margin: 15px 0;
+  }
+</style>
+
 </head>
 <body>
 
@@ -1194,6 +1238,56 @@ window.addEventListener('DOMContentLoaded', function() {
     ctx.setLineDash([]);
 
     // Chart Labels
+    ctx.fillStyle = "#8c99b2";
+    ctx.font = "10px sans-serif";
+    ctx.fillText("📈 Yield Growth (8.5% APY)", 15, 25);
+    ctx.fillText("⚡ Auto Repay Stream", w - 120, h - 8);
+  }
+
+  window.addEventListener("load", () => {
+    setTimeout(renderYieldChart, 400);
+  });
+</script>
+
+
+<script id="arc-vault-full-js">
+  function toggleWalletDrawer() {
+    const drawer = document.getElementById("wallet-drawer");
+    const overlay = document.getElementById("drawer-overlay");
+    if (!drawer || !overlay) return;
+    if (drawer.classList.contains("open")) {
+      drawer.classList.remove("open");
+      overlay.style.display = "none";
+    } else {
+      drawer.classList.add("open");
+      overlay.style.display = "block";
+    }
+  }
+
+  function renderYieldChart() {
+    const canvas = document.getElementById("yieldCanvas");
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    const w = canvas.width = canvas.offsetWidth;
+    const h = canvas.height = canvas.offsetHeight;
+    ctx.clearRect(0, 0, w, h);
+
+    ctx.beginPath();
+    ctx.strokeStyle = "#c9a54e";
+    ctx.lineWidth = 2;
+    ctx.moveTo(10, h - 15);
+    ctx.bezierCurveTo(w * 0.3, h - 25, w * 0.6, h - 65, w - 10, 15);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.strokeStyle = "#2ebac6";
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([4, 4]);
+    ctx.moveTo(10, 25);
+    ctx.lineTo(w - 10, h - 15);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
     ctx.fillStyle = "#8c99b2";
     ctx.font = "10px sans-serif";
     ctx.fillText("📈 Yield Growth (8.5% APY)", 15, 25);
