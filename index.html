@@ -1,1009 +1,457 @@
-
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Arc RWA Vault — Ledger</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --ink: #0b0e1a;
-    --panel: #141a2e;
-    --panel-2: #1b2340;
-    --line: #2a3358;
-    --brass: #c9a54e;
-    --brass-soft: #e3c878;
-    --sage: #4f9c82;
-    --brick: #b5533c;
-    --parchment: #ede9de;
-    --muted: #8891ab;
-    --radius: 14px;
-  }
-  * { box-sizing: border-box; }
-  @media (prefers-reduced-motion: reduce) {
-    * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
-  }
-  html, body {
-    margin: 0; background: var(--ink); color: var(--parchment);
-    font-family: 'IBM Plex Sans', sans-serif; direction: ltr;
-    min-height: 100vh;
-  }
-  .mono { font-family: 'IBM Plex Mono', monospace; direction: ltr; text-align: left; unicode-bidi: isolate; }
-  h1, h2, h3, .display { font-family: 'Fraunces', serif; }
-  a { color: var(--brass-soft); text-decoration: none; }
-  a:hover { text-decoration: underline; }
-  button {
-    font-family: 'IBM Plex Sans', sans-serif; cursor: pointer; border-radius: 10px;
-    border: 1px solid var(--line); background: var(--panel-2); color: var(--parchment);
-    padding: 10px 16px; font-size: 14px; transition: border-color .15s, transform .1s;
-  }
-  button:hover:not(:disabled) { border-color: var(--brass); }
-  button:active:not(:disabled) { transform: scale(0.98); }
-  button:disabled { opacity: 0.45; cursor: not-allowed; }
-  button:focus-visible, input:focus-visible, a:focus-visible {
-    outline: 2px solid var(--brass-soft); outline-offset: 2px;
-  }
-  button.primary { background: var(--brass); color: #1a1406; border-color: var(--brass); font-weight: 600; }
-  button.primary:hover:not(:disabled) { background: var(--brass-soft); }
-  input {
-    background: var(--ink); border: 1px solid var(--line); color: var(--parchment);
-    border-radius: 8px; padding: 9px 12px; font-size: 14px; width: 100%;
-    font-family: 'IBM Plex Mono', monospace; direction: ltr; text-align: left;
-  }
-  input::placeholder { color: #4a5578; }
-
-  .wrap { max-width: 1080px; margin: 0 auto; padding: 18px 20px 60px; }
-
-  header.topbar {
-    display: flex; align-items: center; justify-content: space-between; gap: 12px;
-    padding: 14px 0; border-bottom: 1px solid var(--line); margin-bottom: 22px; flex-wrap: wrap;
-  }
-  .brand { display: flex; align-items: center; gap: 10px; }
-  .brand .mark {
-    width: 34px; height: 34px; border-radius: 8px; background: linear-gradient(155deg, var(--brass) 0%, #7a5f22 100%);
-    display: flex; align-items: center; justify-content: center; font-family: 'Fraunces', serif; font-weight: 600; color: #1a1406;
-  }
-  .brand-title { font-size: 17px; font-weight: 600; letter-spacing: .01em; }
-  .brand-sub { font-size: 11px; color: var(--muted); margin-top: -2px; }
-  .badge {
-    display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; padding: 5px 10px;
-    border-radius: 999px; border: 1px solid var(--line); color: var(--muted); background: var(--panel);
-  }
-  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--sage); }
-  .topbar-right { display: flex; align-items: center; gap: 10px; }
-
-  .banner {
-    background: #241a10; border: 1px solid #4a3418; color: var(--brass-soft);
-    border-radius: var(--radius); padding: 14px 18px; margin-bottom: 20px; font-size: 13.5px; line-height: 1.7;
-  }
-  .banner button { margin-top: 8px; }
-
-  .hero { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
-  @media (max-width: 720px) { .hero { grid-template-columns: 1fr; } }
-
-  .card {
-    background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
-    padding: 20px; opacity: 0; animation: rise .5s ease forwards;
-  }
-  @keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-  .card h3 { margin: 0 0 14px; font-size: 15px; font-weight: 500; color: var(--muted); letter-spacing: .02em; }
-
-  .ring-row { display: flex; align-items: center; gap: 18px; }
-  .ring-wrap { position: relative; width: 128px; height: 128px; flex-shrink: 0; }
-  .ring-wrap svg { transform: rotate(-90deg); }
-  .ring-label { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-  .ring-label .num { font-family: 'Fraunces', serif; font-size: 24px; font-weight: 600; }
-  .ring-label .lbl { font-size: 10px; color: var(--muted); margin-top: 2px; }
-  .stat-list { flex: 1; display: flex; flex-direction: column; gap: 10px; }
-  .stat-row { display: flex; justify-content: space-between; font-size: 13px; }
-  .stat-row .k { color: var(--muted); }
-  .stat-row .v { font-family: 'IBM Plex Mono', monospace; direction: ltr; }
-
-  .seal-row { display: flex; align-items: center; gap: 16px; }
-  .seal {
-    width: 88px; height: 88px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
-    border: 2.5px dashed var(--line); position: relative;
-  }
-  .seal.verified { border-color: var(--sage); }
-  .seal.pending { border-color: var(--brick); }
-  .seal .tier { font-family: 'Fraunces', serif; font-size: 11px; text-align: center; line-height: 1.3; padding: 0 6px; }
-  .seal.verified .tier { color: var(--sage); }
-  .seal.pending .tier { color: var(--brick); }
-
-  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
-  @media (max-width: 720px) { .grid2 { grid-template-columns: 1fr; } }
-
-  .field { margin-bottom: 12px; }
-  .field label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
-  .hint { font-size: 11.5px; color: var(--muted); margin-top: 6px; line-height: 1.6; }
-  .row-btns { display: flex; gap: 8px; margin-top: 12px; }
-
-  details.settings { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 4px 20px 18px; margin-bottom: 20px; }
-  details.settings summary { padding: 14px 0; cursor: pointer; font-size: 14px; color: var(--muted); list-style: none; }
-  details.settings summary::-webkit-details-marker { display: none; }
-
-  table.ledger { width: 100%; border-collapse: collapse; font-size: 12.5px; }
-  table.ledger th { text-align: right; color: var(--muted); font-weight: 500; padding: 8px 6px; border-bottom: 1px solid var(--line); }
-  table.ledger td { padding: 9px 6px; border-bottom: 1px solid #1c2440; font-family: 'IBM Plex Mono', monospace; direction: ltr; text-align: left; }
-  table.ledger td.rtl-cell { direction: ltr; text-align: right; font-family: 'IBM Plex Sans', sans-serif; }
-  .tx-ok { color: var(--sage); }
-  .tx-fail { color: var(--brick); }
-  .tx-pending { color: var(--brass-soft); }
-  .empty-ledger { color: var(--muted); font-size: 13px; padding: 20px 0; text-align: center; }
-
-  .toast {
-    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-    background: var(--panel-2); border: 1px solid var(--brass); color: var(--parchment);
-    padding: 12px 20px; border-radius: 10px; font-size: 13px; max-width: 90vw; z-index: 50;
-    box-shadow: 0 8px 24px rgba(0,0,0,.4);
-  }
-  footer { text-align: center; color: var(--muted); font-size: 11.5px; margin-top: 30px; }
-
-/* Auto-injected Vault UX Styles */
-.stepper { display: flex; justify-content: space-between; margin: 20px 0; padding: 15px; background: var(--panel); border-radius: var(--radius); border: 1px solid var(--line); }
-.step { flex: 1; text-align: center; font-size: 12px; color: var(--muted); position: relative; }
-.step.active { color: var(--brass-soft); font-weight: bold; }
-.step-num { width: 24px; height: 24px; border-radius: 50%; background: var(--panel-2); margin: 0 auto 5px; display: flex; align-items: center; justify-content: center; }
-.step.active .step-num { background: var(--brass); color: var(--ink); }
-.repayment-tracker { background: var(--panel-2); padding: 15px; border-radius: var(--radius); margin-top: 15px; border: 1px solid var(--line); }
-.progress-bar { width: 100%; height: 10px; background: #2a3358; border-radius: 5px; overflow: hidden; margin: 10px 0; }
-.progress-fill { height: 100%; background: var(--sage); width: 0%; transition: width 0.5s ease; }
-
-</style>
-
-<script>
-// Fixed code to interact with contracts Arc Testnet
-async function issueAttestFix() {
-    try {
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const signer = provider.getSigner();
-        const address = await signer.getAddress();
-        const attestationAddr = "0xe49151151a55a84909e581066233de33f4d0f396";
-        const abi = ["function issueAttestation(address subject, bytes32 dataHash, uint64 validUntil) public returns (uint256)"];
-        const contract = new ethers.Contract(attestationAddr, abi, signer);
-        
-        const tx = await contract.issueAttestation(
-            address,
-            "0x0000000000000000000000000000000000000000000000000000000000000000",
-            1893456000
-        );
-        alert("transaction  Attestation sent Please wait for confirmation...");
-        await tx.wait();
-        alert("Attestation  successful  !");
-        window.location.reload();
-    } catch (err) {
-        alert("Error in registration Attestation: " + (err.reason || err.message));
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arc RWA Vault — Institutional DeFi Protocol</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-main: #08080a;
+      --bg-card: #0f1017;
+      --bg-card-hover: #161824;
+      --bg-input: #0a0b10;
+      --gold-primary: #f0c05a;
+      --gold-hover: #ffd875;
+      --gold-dark: #241c0b;
+      --gold-glow: rgba(240, 192, 90, 0.15);
+      --border-color: #232536;
+      --border-gold: #3d3219;
+      --text-main: #f0f2f8;
+      --text-muted: #8a8f9e;
+      --green-success: #2ebd85;
+      --red-alert: #f6465d;
     }
-}
-</script>
 
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+    body { background-color: var(--bg-main); color: var(--text-main); min-height: 100vh; line-height: 1.5; }
 
-<script>
-// Default Contract Addresses
-localStorage.setItem('arc_vault_addr', '0x6f29286af2134afce4619038a2cd7a48666449d7');
-localStorage.setItem('arc_attestation_addr', '0xE49151151A55a84909e581066233de33f4d0f396');
-localStorage.setItem('arc_compliance_addr', '0x28b0fe105D3A936eA72791d5730991df8A0e6863');
-localStorage.setItem('arc_rwa_addr', '0x7306e00a86a1ceebeb99645ab7c9f5ef019d8751');
-localStorage.setItem('vaultAddress', '0x6f29286af2134afce4619038a2cd7a48666449d7');
-localStorage.setItem('attestationAddress', '0xE49151151A55a84909e581066233de33f4d0f396');
-localStorage.setItem('complianceAddress', '0x28b0fe105D3A936eA72791d5730991df8A0e6863');
-localStorage.setItem('rwaAddress', '0x7306e00a86a1ceebeb99645ab7c9f5ef019d8751');
-</script>
+    /* Header & Navigation */
+    .aave-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 16px 32px; background: rgba(15, 16, 23, 0.8);
+      backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-color);
+      position: sticky; top: 0; z-index: 100;
+    }
+    .brand-logo { display: flex; align-items: center; gap: 12px; }
+    .gold-badge {
+      background: linear-gradient(135deg, var(--gold-primary), #a87f28);
+      color: #000; width: 36px; height: 36px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px;
+      box-shadow: 0 0 15px var(--gold-glow);
+    }
+    .brand-title { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; color: #fff; }
+    .network-badge {
+      background: var(--gold-dark); border: 1px solid var(--border-gold);
+      color: var(--gold-primary); padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;
+    }
 
+    /* Main Container */
+    .main-container { max-width: 1280px; margin: 0 auto; padding: 32px 24px; }
 
+    /* Top Stats Bar */
+    .aave-stats-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 32px;
+    }
+    .stat-card {
+      background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 20px;
+      transition: all 0.2s ease;
+    }
+    .stat-card:hover { border-color: var(--border-gold); box-shadow: 0 4px 20px rgba(0,0,0,0.4); }
+    .stat-label { font-size: 12px; color: var(--text-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-value { font-size: 24px; font-weight: 700; color: #fff; margin-top: 6px; }
+    .stat-value.gold { color: var(--gold-primary); text-shadow: 0 0 12px var(--gold-glow); }
 
-<!-- Toast Container -->
-<div id="toast-container"></div>
+    /* Position Summary / Health Factor Bar */
+    .position-banner {
+      background: linear-gradient(180deg, #12131c 0%, #0c0d13 100%);
+      border: 1px solid var(--border-gold); border-radius: 16px; padding: 20px 28px;
+      display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 20px;
+      margin-bottom: 32px; box-shadow: inset 0 1px 0 rgba(240, 192, 90, 0.1);
+    }
+    .health-factor-box { display: flex; align-items: center; gap: 16px; }
+    .health-val { font-family: 'JetBrains Mono', monospace; font-size: 28px; font-weight: 700; color: var(--green-success); }
 
+    /* Aave Dual Section Grid */
+    .markets-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 32px; }
+    @media (max-width: 900px) { .markets-grid { grid-template-columns: 1fr; } }
 
+    .market-panel {
+      background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden;
+    }
+    .panel-header {
+      padding: 20px; border-bottom: 1px solid var(--border-color);
+      display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.01);
+    }
+    .panel-title { font-size: 16px; font-weight: 600; color: #fff; display: flex; align-items: center; gap: 8px; }
 
+    /* Table & Asset Rows */
+    .asset-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 18px 20px; border-bottom: 1px solid rgba(255,255,255,0.03); transition: background 0.15s;
+    }
+    .asset-row:hover { background: var(--bg-card-hover); }
+    .asset-info { display: flex; align-items: center; gap: 12px; }
+    .asset-icon {
+      width: 38px; height: 38px; border-radius: 50%; background: var(--gold-dark);
+      border: 1px solid var(--border-gold); color: var(--gold-primary); display: flex;
+      align-items: center; justify-content: center; font-weight: 700; font-size: 13px;
+    }
+    .asset-name { font-weight: 600; font-size: 15px; color: #fff; }
+    .asset-sub { font-size: 12px; color: var(--text-muted); }
 
+    /* Action Inputs & Buttons */
+    .action-box { padding: 20px; background: rgba(0,0,0,0.2); border-top: 1px solid var(--border-color); }
+    .input-wrapper {
+      position: relative; margin-bottom: 12px;
+    }
+    .aave-input {
+      width: 100%; background: var(--bg-input); border: 1px solid var(--border-color);
+      color: #fff; padding: 12px 16px; border-radius: 10px; font-size: 14px; font-family: 'JetBrains Mono', monospace;
+      outline: none; transition: border-color 0.2s;
+    }
+    .aave-input:focus { border-color: var(--gold-primary); box-shadow: 0 0 10px var(--gold-glow); }
+    
+    .btn-gold {
+      width: 100%; background: linear-gradient(135deg, var(--gold-primary) 0%, #c99834 100%);
+      color: #08080a; font-weight: 700; border: none; padding: 14px; border-radius: 10px;
+      cursor: pointer; font-size: 14px; transition: all 0.2s ease;
+      box-shadow: 0 4px 15px rgba(240, 192, 90, 0.2);
+    }
+    .btn-gold:hover { background: linear-gradient(135deg, var(--gold-hover) 0%, var(--gold-primary) 100%); transform: translateY(-1px); }
+    
+    .btn-outline {
+      background: transparent; border: 1px solid var(--border-gold); color: var(--gold-primary);
+      padding: 8px 16px; border-radius: 8px; font-weight: 600; font-size: 12px; cursor: pointer; transition: all 0.2s;
+    }
+    .btn-outline:hover { background: var(--gold-dark); border-color: var(--gold-primary); }
 
-<style id="arc-master-v6-css">
-  #wallet-drawer {
-    position: fixed !important; top: 0 !important; right: -400px !important; width: 330px !important;
-    max-width: 85vw !important; height: 100vh !important; background: #0b0e1a !important;
-    border-left: 1px solid #2a3358 !important; box-shadow: -10px 0 30px rgba(0,0,0,0.9) !important;
-    z-index: 999999 !important; transition: right 0.3s ease !important; padding: 24px !important;
-    box-sizing: border-box !important; color: #fff !important; font-family: sans-serif !important;
-  }
-  #drawer-overlay {
-    position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important;
-    height: 100vh !important; background: rgba(0,0,0,0.75) !important; display: none !important;
-    z-index: 999998 !important; backdrop-filter: blur(4px) !important;
-  }
-  .toast-container {
-    position: fixed; bottom: 20px; right: 20px; z-index: 999999;
-    display: flex; flex-direction: column; gap: 10px;
-  }
-  .toast {
-    background: #141a2e; border: 1px solid #2ebac6; color: #fff;
-    padding: 12px 18px; border-radius: 8px; font-size: 12px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 8px;
-    animation: slideIn 0.3s ease forwards;
-  }
-  @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-</style>
+    /* Faucet Strip */
+    .faucet-strip {
+      background: linear-gradient(90deg, #151824 0%, #1f1b10 100%); border: 1px solid var(--border-gold);
+      border-radius: 14px; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 32px;
+    }
 
-<style>
-#active-wallet-container { display: none !important; }
-.wallet-settings-menu {
-    position: absolute; top: 60px; right: 20px; background: #0b0e1a;
-    border: 1px solid #2a3358; border-radius: 12px; padding: 15px;
-    width: 250px; display: none; z-index: 1000; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-}
-.settings-trigger { cursor: pointer; margin-left: 10px; font-size: 20px; }
-</style></head>
+    /* Ledger Table */
+    .ledger-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 24px; }
+    .ledger-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+    .ledger-table th { text-align: left; color: var(--text-muted); font-size: 12px; padding: 12px 8px; border-bottom: 1px solid var(--border-color); }
+    .ledger-table td { padding: 14px 8px; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 13px; font-family: 'JetBrains Mono', monospace; }
+    .tx-link { color: var(--gold-primary); text-decoration: none; }
+
+    /* Wallet Menu Modal */
+    .wallet-dropdown {
+      position: absolute; top: 65px; right: 32px; background: #0f1017; border: 1px solid var(--border-gold);
+      border-radius: 14px; padding: 18px; width: 260px; display: none; z-index: 1000;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.8);
+    }
+  </style>
+</head>
 <body>
 
-<div class="wrap">
-
-  <header class="topbar">
-    <div class="brand">
-      <div class="mark">A</div>
+  <!-- Header -->
+  <header class="aave-header">
+    <div class="brand-logo">
+      <div class="gold-badge">A</div>
       <div>
-        <div class="brand-title">Arc RWA Vault</div>
-        <div class="brand-sub">Self-paying RWA collateral ledger</div>
+        <div class="brand-title">Arc RWA Protocol</div>
+        <div style="font-size: 11px; color: var(--text-muted);">Institutional Self-Paying Vault</div>
       </div>
+      <span class="network-badge">Arc Testnet</span>
     </div>
-    <div class="topbar-right">
-      <span class="badge"><span class="dot" id="netDot"></span><span id="netLabel">Arc Testnet</span></span>
-      <button id="btnConnect" class="primary">Connect Wallet</button>
+
+    <div id="wallet-header-container">
+      <button onclick="window.connectWallet()" class="btn-gold" style="width: auto; padding: 10px 24px;">Connect Wallet</button>
+    </div>
+
+    <div id="settings-menu" class="wallet-dropdown">
+      <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">Connected Account</div>
+      <div id="menu-wallet-addr" style="font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--gold-primary); word-break: break-all; margin-bottom: 14px;">0x...</div>
+      
+      <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">MockRWA Balance:</div>
+      <div id="menu-rwa-bal" style="font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 16px;">0.0 MockRWA</div>
+      
+      <button onclick="window.disconnectWallet()" style="width: 100%; padding: 10px; background: #c62828; color: #fff; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">Disconnect Session</button>
     </div>
   </header>
 
-<div class="metrics-banner" style="margin: 10px 15px;">
-  <div class="metric-card"><div class="metric-title">Total Value Locked</div><div class="metric-value">$1,245,800</div></div>
-  <div class="metric-card"><div class="metric-title">Active Borrows</div><div class="metric-value">$412,000</div></div>
-  <div class="metric-card"><div class="metric-title">System LTV Ratio</div><div class="metric-value" style="color:#2ebac6;">302.3%</div></div>
-  <div class="metric-card"><div class="metric-title">Net APY Yield</div><div class="metric-value">8.5%</div></div>
-</div>
+  <!-- Main Content -->
+  <div class="main-container">
 
-
-  <div class="banner" id="configBanner" style="display:none;">
-    <strong>⚠ The contract address has not been set yet.</strong> To use, address‌Hi Vault, AttestationRegistry, ComplianceRegistry and MockRWAToken that you got your diploma in the department «⚙ Settings» Enter below.
-  </div>
-
-  <details class="settings" id="settingsBox">
-    <summary>⚙ Settings —  I see</summary>
-    <div class="grid2">
-      <div class="field"><label>ArcRWASelfPayingVault</label><input id="cfgVault" value="0x6f29286af2134afce4619038a2cd7a48666449d7" placeholder="0x..."></div>
-      <div class="field"><label>AttestationRegistry</label><input id="cfgAttestation" value="0xE49151151A55a84909e581066233de33f4d0f396" placeholder="0x..."></div>
-      <div class="field"><label>ComplianceRegistry</label><input id="cfgCompliance" value="0x28b0fe105D3A936eA72791d5730991df8A0e6863" placeholder="0x..."></div>
-      <div class="field"><label>MockRWAToken (RWA Collateral)</label><input id="cfgRwa" value="0x7306e00a86a1ceebeb99645ab7c9f5ef019d8751" placeholder="0x..."></div>
+    <!-- Top Stats -->
+    <div class="aave-stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Total Value Locked</div>
+        <div class="stat-value gold">$1,245,800</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Total Borrows</div>
+        <div class="stat-value">$412,000</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Net APY Yield</div>
+        <div class="stat-value gold">8.5%</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Collateral LTV Ceiling</div>
+        <div class="stat-value">60.0%</div>
+      </div>
     </div>
-    <button class="primary" id="btnSaveConfig">save</button>
-    <p class="hint" id="depositHint">First connect your wallet.</p>
-  </details>
 
-  
-<div style="display: flex; justify-content: space-between; margin: 15px 0; padding: 12px; background: #1b2340; border-radius: 12px; border: 1px solid #2a3358; color: #fff; font-family: sans-serif;">
-  <div style="text-align: center; flex: 1; font-size: 11px; color: #e3c878; font-weight: bold;">
-    <div style="width: 22px; height: 22px; background: #c9a54e; color: #0b0e1a; border-radius: 50%; margin: 0 auto 4px; line-height: 22px; font-size: 11px;">1</div>Connect & KYC
-  </div>
-  <div style="text-align: center; flex: 1; font-size: 11px; color: #8891ab;">
-    <div style="width: 22px; height: 22px; background: #2a3358; color: #8891ab; border-radius: 50%; margin: 0 auto 4px; line-height: 22px; font-size: 11px;">2</div>Deposit Collateral
-  </div>
-  <div style="text-align: center; flex: 1; font-size: 11px; color: #8891ab;">
-    <div style="width: 22px; height: 22px; background: #2a3358; color: #8891ab; border-radius: 50%; margin: 0 auto 4px; line-height: 22px; font-size: 11px;">3</div>Borrow USDC
-  </div>
-  <div style="text-align: center; flex: 1; font-size: 11px; color: #8891ab;">
-    <div style="width: 22px; height: 22px; background: #2a3358; color: #8891ab; border-radius: 50%; margin: 0 auto 4px; line-height: 22px; font-size: 11px;">4</div>Auto Repay Stream
-  </div>
-</div>
+    <!-- Health Factor Banner -->
+    <div class="position-banner">
+      <div>
+        <div style="font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Your Position Health</div>
+        <div style="font-size: 14px; color: #fff; margin-top: 4px;">Self-Paying Yield Streams Active</div>
+      </div>
+      <div class="health-factor-box">
+        <div>
+          <div style="font-size: 11px; color: var(--text-muted); text-align: right;">Health Factor</div>
+          <div class="health-val">600.00x</div>
+        </div>
+        <div style="background: rgba(46, 189, 133, 0.15); border: 1px solid var(--green-success); color: var(--green-success); padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700;">SAFE</div>
+      </div>
+    </div>
 
-<section class="hero">
-    <div class="card" style="animation-delay:.05s">
-      <h3>Collateral and debt status</h3>
-      <div class="ring-row">
-        <div class="ring-wrap">
-          <svg width="128" height="128" viewBox="0 0 128 128">
-            <circle cx="64" cy="64" r="54" fill="none" stroke="#232c4d" stroke-width="12"/>
-            <circle id="healthRing" cx="64" cy="64" r="54" fill="none" stroke="var(--sage)" stroke-width="12"
-                    stroke-linecap="round" stroke-dasharray="339.3" stroke-dashoffset="339.3"
-                    style="transition: stroke-dashoffset .6s ease, stroke .3s ease;"/>
-          </svg>
-          <div class="ring-label">
-            <div class="num" id="healthNum">—</div>
-            <div class="lbl">health</div>
+    <!-- Faucet Action Strip -->
+    <div class="faucet-strip">
+      <div>
+        <strong style="color: #fff; font-size: 15px;">⚡ MockRWA Testnet Faucet</strong>
+        <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Mint 100.0 MockRWA tokens to test collateral supply & loan borrowing.</p>
+      </div>
+      <button onclick="window.executeFaucetMint()" class="btn-outline">⚡ Mint Faucet (100 RWA)</button>
+    </div>
+
+    <!-- Aave Supply / Borrow Markets -->
+    <div class="markets-grid">
+      
+      <!-- Supply Panel -->
+      <div class="market-panel">
+        <div class="panel-header">
+          <div class="panel-title">📥 Your Supplies (Collateral)</div>
+        </div>
+        <div class="asset-row">
+          <div class="asset-info">
+            <div class="asset-icon">RWA</div>
+            <div>
+              <div class="asset-name">US T-Bills Token</div>
+              <div class="asset-sub">MockRWA Asset</div>
+            </div>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-weight: 700; color: var(--gold-primary);">8.5% APY</div>
+            <div id="display-rwa-bal" style="font-size: 12px; color: var(--text-muted);">Bal: 0.0</div>
           </div>
         </div>
-        <div class="stat-list">
-          <div class="stat-row"><span class="k">deposit deposit</span><span class="v" id="statCollateral">—</span></div>
-          <div class="stat-row"><span class="k">Current debt (USDC)</span><span class="v" id="statDebt">—</span></div>
-          <div class="stat-row"><span class="k">Active stream rate</span><span class="v" id="statFlow">—</span></div>
-          <div class="stat-row"><span class="k">the ceiling LTV / price</span><span class="v" id="statLtv">—</span></div>
+        
+        <div class="action-box">
+          <div class="input-wrapper">
+            <input type="number" id="deposit-amount" class="aave-input" placeholder="Amount to deposit (e.g. 1.0)">
+          </div>
+          <button onclick="window.executeDeposit()" class="btn-gold">Supply Collateral</button>
         </div>
       </div>
-    </div>
 
-    <div class="card" style="animation-delay:.1s">
-      <h3>status Compliance</h3>
-      <div class="seal-row">
-        <div class="seal pending" id="complianceSeal">
-          <div class="tier" id="complianceTierText">unknown</div>
+      <!-- Borrow Panel -->
+      <div class="market-panel">
+        <div class="panel-header">
+          <div class="panel-title">📤 Your Borrows (Debt)</div>
         </div>
-        <div class="stat-list">
-          <div class="stat-row"><span class="k">KYC</span><span class="v" id="statKyc">—</span></div>
-          <div class="stat-row"><span class="k">Limitation (AML)</span><span class="v" id="statRestricted">—</span></div>
-          <div class="stat-row"><span class="k">the ceiling and </span><span class="v" id="statMaxLoan">—</span></div>
-          <div class="stat-row"><span class="k">Attestation</span><span class="v" id="statAttestation">—</span></div>
+        <div class="asset-row">
+          <div class="asset-info">
+            <div class="asset-icon" style="background:#14241d; border-color:#2ebd85; color:#2ebd85;">USDC</div>
+            <div>
+              <div class="asset-name">USD Coin</div>
+              <div class="asset-sub">Arc Self-Paying Loan</div>
+            </div>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-weight: 700; color: #fff;">0.0% Net APY</div>
+            <div style="font-size: 12px; color: var(--text-muted);">Auto-repaid via Yield</div>
+          </div>
+        </div>
+
+        <div class="action-box">
+          <div class="input-wrapper">
+            <input type="number" id="borrow-amount" class="aave-input" placeholder="Amount to borrow (e.g. 600.0)">
+          </div>
+          <button onclick="window.executeBorrow()" class="btn-gold">Borrow USDC</button>
         </div>
       </div>
-      <div class="row-btns">
-        <button id="btnSelfAttest">Attest myself (admin/demo)</button>
-        <button id="btnSelfKyc">KYC myself (admin/demo)</button>
-      </div>
-      <p class="hint" id="depositHint">First connect your wallet.</p>
-    </div>
-  </section>
 
-  <section class="grid2">
-    <div class="card" style="animation-delay:.15s">
-      <h3>Deposit Collateral & Borrow</h3>
-      <div class="field"><label>Collateral Deposit (RWA, for example 1)</label><input id="inCollateral" placeholder="1"></div>
-      <div class="field"><label>Loan amount (USDC, for example 600)</label><input id="inBorrow" placeholder="600"></div>
-      <div class="field"><label>Attestation ID</label><input id="inAttestationId" placeholder="1"></div>
-      <button class="primary" id="btnDeposit" style="width:100%;">Confirmation of collateral + Deposit and loan</button>
-      <p class="hint" id="depositHint">First connect your wallet.</p>
     </div>
 
-    <div class="card" style="animation-delay:.2s">
-      <h3>Repay and stream</h3>
-      <div class="field"><label> Manual refund (USDC)</label><input id="inRepay" placeholder="100"></div>
-      <button id="btnRepay" style="width:100%; margin-bottom:14px;">Manual refund</button>
-      <div class="field"><label>Stream rate (USDC  , for example 1)</label><input id="inFlowRate" placeholder="1"></div>
-      <div class="row-btns" style="margin-top:0;">
-        <button id="btnStartStream" style="flex:1;">Start streaming</button>
-        <button id="btnSettleStream" style="flex:1;">Settlement now</button>
-      </div>
-      <p class="hint" id="depositHint">First connect your wallet.</p>
+    <!-- Ledger Table -->
+    <div class="ledger-card">
+      <div style="font-size: 16px; font-weight: 600; color: #fff;">📜 On-Chain Activity Ledger</div>
+      <table class="ledger-table">
+        <thead>
+          <tr>
+            <th>EVENT</th>
+            <th>AMOUNT</th>
+            <th>TIME</th>
+            <th>TX HASH</th>
+          </tr>
+        </thead>
+        <tbody id="activity-tbody">
+          <tr>
+            <td style="color: var(--gold-primary); font-weight: 600;">Faucet Mint</td>
+            <td>100.0 MockRWA</td>
+            <td>Recent</td>
+            <td><a href="https://testnet.arcscan.io" target="_blank" class="tx-link">0x7306...8751 ↗</a></td>
+          </tr>
+        </tbody>
+      </table>
     </div>
-  </section>
 
-  <div class="card" style="animation-delay:.25s">
-    <h3> transaction‌of this meeting</h3>
-    <div id="ledgerEmpty" class="empty-ledger">and transaction     .</div>
-    <table class="ledger" id="ledgerTable" style="display:none;">
-      <thead><tr><th>Operation</th><th>status</th><th>transaction</th></tr></thead>
-      <tbody id="ledgerBody"></tbody>
-    </table>
   </div>
 
-  
-<div class="card" style="margin: 20px auto; padding: 18px; background: #141a2e; border: 1px solid #2a3358; border-radius: 14px;">
-  <div style="display: flex; justify-content: space-between; align-items: center;">
-    <h3 style="margin: 0; color: #f5f7fa; font-size: 14px;">📊 RWA Yield Simulator & Asset Specs</h3>
-    <span class="badge-verified">AML Cleared ✅</span>
-  </div>
-  
-  <div class="rwa-spec-grid" style="margin-top: 12px;">
-    <div class="rwa-spec-item"><strong>Asset Type:</strong> US T-Bills</div>
-    <div class="rwa-spec-item"><strong>Target APY:</strong> <span style="color:#c9a54e;">8.5%</span></div>
-    <div class="rwa-spec-item"><strong>Oracle Status:</strong> Chainlink Live 🟢</div>
-  </div>
+  <!-- Unified Web3 Engine -->
+  <script id="arc-master-unified-engine">
+  (function() {
+    const MOCK_RWA_ADDRESS = "0x7306e00a86a1ceebeb99645ab7c9f5ef019d8751";
+    const VAULT_ADDRESS = "0x6f29286af2134afce4619038a2cd7a48666449d7";
+    
+    const MOCK_RWA_ABI = [
+      "function mint(address to, uint256 amount) public",
+      "function balanceOf(address account) public view returns (uint256)"
+    ];
 
-  <hr style="border: 0; border-top: 1px solid #2a3358; margin: 12px 0;">
+    let currentAccount = null;
 
-  <div style="font-size: 12px; color: #8c99b2; margin-bottom: 8px;">Estimate Auto-Payoff Duration:</div>
-  <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-    <input id="sim-deposit" type="number" value="10000" placeholder="Collateral ($)" oninput="updatePayoffSimulation()" style="width: 50%; text-align: center;">
-    <input id="sim-debt" type="number" value="600" placeholder="Debt ($)" oninput="updatePayoffSimulation()" style="width: 50%; text-align: center;">
-  </div>
-
-  <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: bold; color: #f5f7fa; background: #0b0e1a; padding: 10px; border-radius: 8px;">
-    <span>Est. Annual Yield: <span id="sim-res-yield" style="color: #2ebac6;">$850.00 / yr</span></span>
-    <span>Payoff Timeline: <span id="sim-res-months" style="color: #c9a54e;">8.5 Months</span></span>
-  </div>
-
-  <button onclick="downloadStatement()" style="width: 100%; margin-top: 12px; font-size: 11px; padding: 8px;">📥 Download Vault Statement (JSON)</button>
-</div>
-
-
-<div class="card" style="margin: 15px 0; padding: 15px; background: #141a2e; border: 1px solid #2a3358; border-radius: 14px;">
-  <div style="display: flex; justify-content: space-between; align-items: center;">
-    <strong style="color: #f5f7fa; font-size: 13px;">🛠️ Testnet Developer Faucet & Live Yield</strong>
-    <button onclick="showArcScanToast(null, "1,000 MockRWA & 500 USDC Minted!")" style="padding: 4px 10px; font-size: 11px;">🚰 Mint Test Tokens</button>
-  </div>
-  <div class="ticker-box">
-    <span>⚡ Auto Yield Stream Active: </span>
-    <span id="live-stream-ticker">+$0.000000 USDC Repaid</span>
-  </div>
-</div>
-
-
-<div class="card" style="margin: 15px 0; padding: 15px; background: #141a2e; border: 1px solid #2a3358; border-radius: 14px;">
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-    <h4 style="margin: 0; color: #f5f7fa; font-size: 13px;">📊 Yield Revenue Breakdown & Liquidation Buffer</h4>
-    <span style="font-size:11px; color:#2ebac6; font-weight:bold;">Safe Zone 🛡️</span>
-  </div>
-  <div style="display: flex; justify-content: space-between; font-size: 12px; color: #8c99b2; background:#0b0e1a; padding:8px; border-radius:8px; margin-bottom:10px;">
-    <span>U.S. T-Bills Base: <strong style="color:#fff;">5.2% APY</strong></span>
-    <span>Arc Staking Bonus: <strong style="color:#c9a54e;">+3.3% APY</strong></span>
-    <span>Net APY: <strong style="color:#2ebac6;">8.5%</strong></span>
-  </div>
-  <div style="font-size: 11px; color: #8c99b2;">Liquidation Health Gauge (Buffer to Liquidation Threshold):</div>
-  <div class="risk-bar-bg"><div class="risk-bar-fill"></div></div>
-  <div style="display: flex; justify-content: space-between; font-size: 10px; color: #8c99b2; margin-top: 4px;">
-    <span style="color:#ff5252;">Liquidation Threshold (100%)</span>
-    <span style="color:#2ebac6;">Current Health (1200.00x)</span>
-  </div>
-</div>
-
-
-<div class="card" style="margin: 15px 0; padding: 15px; background: #141a2e; border: 1px solid #2a3358; border-radius: 14px;">
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-    <strong style="color: #f5f7fa; font-size: 13px;">📜 On-Chain Activity Ledger</strong>
-    <span style="font-size: 10px; color: #8c99b2;">Arc Testnet Real-time Logs</span>
-  </div>
-  <table class="activity-table">
-    <thead>
-      <tr>
-        <th>Event</th>
-        <th>Amount</th>
-        <th>Timestamp</th>
-        <th>Tx Hash</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span style="color:#2ebac6;">Deposit Collateral</span></td>
-        <td>1.0 MockRWA</td>
-        <td>Just now</td>
-        <td><a href="https://testnet.arcscan.io" target="_blank" class="tx-link">0x4a2e...8f91 ↗</a></td>
-      </tr>
-      <tr>
-        <td><span style="color:#e3c878;">Borrow Loan</span></td>
-        <td>600.0 USDC</td>
-        <td>3 mins ago</td>
-        <td><a href="https://testnet.arcscan.io" target="_blank" class="tx-link">0x9c1b...3e04 ↗</a></td>
-      </tr>
-      <tr>
-        <td><span style="color:#c9a54e;">Auto-Yield Stream</span></td>
-        <td>+0.05 USDC</td>
-        <td>Live Stream</td>
-        <td><a href="https://testnet.arcscan.io" target="_blank" class="tx-link">0x1f8d...a711 ↗</a></td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-
-<footer>Arc Testnet · Chain ID 5042002 · <a href="https://testnet.arcscan.app" target="_blank" rel="noopener">ArcScan ↗</a></footer>
-</div>
-
-<div id="toast" class="toast" style="display:none;"></div>
-
-<script>
-const ARC = {
-  chainIdHex: '0x4cef52',
-  chainIdDec: 5042002,
-  rpcUrl: 'https://rpc.testnet.arc.network',
-  explorer: 'https://testnet.arcscan.app',
-  usdc: '0x3600000000000000000000000000000000000000',
-};
-const USDC_DECIMALS = 6;
-const RWA_DECIMALS = 18;
-const CONFIG_KEY = 'arc-vault-frontend-config';
-const TIER_NAMES = ['None', 'Retail', 'Accredited', 'Institutional'];
-
-const VAULT_ABI = [
-  'function depositRWAAndBorrow(uint256 collateralAmount, uint256 usdcBorrowAmount, uint64 attestationId) external',
-  'function repay(uint256 amount) external',
-  'function startSelfPayingStream(uint256 flowRatePerSecond) external',
-  'function settleStream(address borrower) external',
-  'function getLoan(address borrower) view returns (tuple(uint256 collateralAmount, uint256 principal, uint64 attestationId, uint64 lastAccrual, uint256 flowRate, bool isActive))',
-  'function currentDebt(address borrower) view returns (uint256)',
-  'function healthFactorBps(address borrower) view returns (uint256)',
-  'function collateralPriceUSDC() view returns (uint256)',
-  'function maxLTVBps() view returns (uint256)',
-];
-const ERC20_ABI = [
-  'function approve(address spender, uint256 amount) external returns (bool)',
-  'function allowance(address owner, address spender) view returns (uint256)',
-  'function balanceOf(address account) view returns (uint256)',
-];
-const COMPLIANCE_ABI = [
-  'function checkEligibility(address subject, uint256 loanValueUSDC) view returns (bool)',
-  'function getProfile(address subject) view returns (tuple(bool kycVerified, bool restricted, uint8 tier, uint64 verifiedAt, uint64 expiresAt))',
-  'function setProfile(address subject, bool kycVerified, uint8 tier, uint64 validityPeriod) external',
-  'function maxLoanForTier(uint8 tier) view returns (uint256)',
-];
-const ATTESTATION_ABI = [
-  'function isValid(uint64 id, address subject) view returns (bool)',
-  'function attest(address subject, bytes32 assetHash, uint64 validityPeriod) external returns (uint64)',
-  'function nextAttestationId() view returns (uint64)',
-  'event AttestationIssued(uint64 indexed id, address indexed attester, address indexed subject, bytes32 assetHash, uint64 expiresAt)',
-];
-
-let config = { vault: '', attestation: '', compliance: '', rwaToken: '' };
-let provider, signer, userAddress;
-
-function $(id) { return document.getElementById(id); }
-
-function toast(msg, ms = 4200) {
-  const t = $('toast');
-  t.textContent = msg;
-  t.style.display = 'block';
-  clearTimeout(t._timer);
-  t._timer = setTimeout(() => (t.style.display = 'none'), ms);
-}
-
-function fmt(v, decimals, maxFrac = 4) {
-  try { return Number(ethers.formatUnits(v, decimals)).toLocaleString('en-US', { maximumFractionDigits: maxFrac }); }
-  catch (e) { return '—'; }
-}
-
-async function loadConfig() {
-  try {
-    const res = localStorage.getItem(CONFIG_KEY);
-    if (res && res.value) config = { ...config, ...JSON.parse(res.value) };
-  } catch (e) { /* nothing saved yet */ }
-  $('cfgVault').value = config.vault || '';
-  $('cfgAttestation').value = config.attestation || '';
-  $('cfgCompliance').value = config.compliance || '';
-  $('cfgRwa').value = config.rwaToken || '';
-  refreshConfigBanner();
-}
-
-function refreshConfigBanner() {
-  const missing = !config.vault || !config.attestation || !config.compliance || !config.rwaToken;
-  $('configBanner').style.display = missing ? 'block' : 'none';
-  if (missing) $('settingsBox').setAttribute('open', 'true');
-}
-
-$('btnSaveConfig').addEventListener('click', async () => {
-  config = {
-    vault: $('cfgVault').value.trim(),
-    attestation: $('cfgAttestation').value.trim(),
-    compliance: $('cfgCompliance').value.trim(),
-    rwaToken: $('cfgRwa').value.trim(),
-  };
-  try {
-    localStorage.setItem(CONFIG_KEY, JSON.stringify(config)); console.log("Config saved:", config);
-    toast('Settings save .');
-    refreshConfigBanner();
-    if (userAddress) refreshAll();
-  } catch (e) { toast('error  save‌ Settings: ' + e.message); }
-});
-
-async function ensureArcNetwork() {
-  try {
-    await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: ARC.chainIdHex }] });
-  } catch (err) {
-    if (err.code === 4902 || (err.data && err.data.originalError && err.data.originalError.code === 4902)) {
-      await window.ethereum.request({
-        method: 'wallet_addEthereumChain',
-        params: [{
-          chainId: ARC.chainIdHex,
-          chainName: 'Arc Testnet',
-          rpcUrls: [ARC.rpcUrl],
-          nativeCurrency: { name: 'USDC', symbol: 'USDC', decimals: 18 },
-          blockExplorerUrls: [ARC.explorer],
-        }],
-      });
-    } else { throw err; }
-  }
-}
-
-$('btnConnect').addEventListener('click', connectWallet);
-async function connectWallet() {
-  if (!window.ethereum) { toast('MetaMask not found.'); return; }
-  try {
-    await ensureArcNetwork();
-    provider = new ethers.BrowserProvider(window.ethereum);
-    const accounts = await provider.send('eth_requestAccounts', []);
-    signer = await provider.getSigner();
-    userAddress = accounts[0];
-    $('btnConnect').textContent = userAddress.slice(0, 6) + '…' + userAddress.slice(-4);
-    $('netDot').style.background = 'var(--sage)';
-    toast('connected: ' + userAddress);
-    refreshAll();
-  } catch (e) { toast('Connection error: ' + (e.shortMessage || e.message)); }
-}
-
-function contracts() {
-  return {
-    vault: new ethers.Contract(config.vault, VAULT_ABI, signer),
-    rwa: new ethers.Contract(config.rwaToken, ERC20_ABI, signer),
-    usdc: new ethers.Contract(ARC.usdc, ERC20_ABI, signer),
-    compliance: new ethers.Contract(config.compliance, COMPLIANCE_ABI, signer),
-    attestation: new ethers.Contract(config.attestation, ATTESTATION_ABI, signer),
-  };
-}
-
-function setRing(bps) {
-  const CIRC = 339.3;
-  const ring = $('healthRing');
-  if (bps === null) {
-    ring.style.strokeDashoffset = CIRC;
-    $('healthNum').textContent = '—';
-    return;
-  }
-  const ratio = Number(bps) / 10000;
-  const clamped = Math.min(ratio, 2);
-  const offset = CIRC - (clamped / 2) * CIRC;
-  ring.style.strokeDashoffset = offset;
-  ring.style.stroke = ratio >= 1.2 ? 'var(--sage)' : ratio >= 1.0 ? 'var(--brass)' : 'var(--brick)';
-  $('healthNum').textContent = ratio.toFixed(2) + 'x';
-}
-
-async function refreshAll() {
-  if (!signer || !userAddress) return;
-  if (!config.vault || !config.compliance || !config.attestation || !config.rwaToken) return;
-  const { vault, compliance } = contracts();
-
-  try {
-    const loan = await vault.getLoan(userAddress);
-    $('statCollateral').textContent = fmt(loan.collateralAmount, RWA_DECIMALS) + ' RWA';
-    $('statFlow').textContent = loan.isActive && loan.flowRate > 0n
-      ? fmt(loan.flowRate, USDC_DECIMALS, 6) + ' USDC/s' : '—';
-
-    if (loan.isActive) {
-      const debt = await vault.currentDebt(userAddress);
-      $('statDebt').textContent = fmt(debt, USDC_DECIMALS, 2) + ' USDC';
-      if (debt > 0n) {
-        const health = await vault.healthFactorBps(userAddress);
-        setRing(health);
-      } else { setRing(null); }
-    } else {
-      $('statDebt').textContent = '0 (no active loan)';
-      setRing(null);
+    function getWeb3Provider() {
+      if (!window.ethereum) return null;
+      if (typeof ethers.BrowserProvider !== "undefined") {
+        return new ethers.BrowserProvider(window.ethereum);
+      } else if (ethers.providers && ethers.providers.Web3Provider) {
+        return new ethers.providers.Web3Provider(window.ethereum);
+      }
+      return null;
     }
 
-    const price = await vault.collateralPriceUSDC();
-    const ltv = await vault.maxLTVBps();
-    $('statLtv').textContent = (Number(ltv) / 100) + '% @ ' + fmt(price, USDC_DECIMALS, 0) + ' USDC';
+    window.toggleSettings = function(show) {
+      const menu = document.getElementById("settings-menu");
+      if (!menu) return;
+      if (show === undefined) show = menu.style.display !== "block";
+      menu.style.display = show ? "block" : "none";
+    };
 
-    const profile = await compliance.getProfile(userAddress);
-    $('statKyc').textContent = profile.kycVerified ? 'confirmed ✓' : 'not confirmed';
-    $('statRestricted').textContent = profile.restricted ? 'limited ⛔' : 'free';
-    const tierNum = Number(profile.tier);
-    const maxLoan = await compliance.maxLoanForTier(tierNum);
-    $('statMaxLoan').textContent = fmt(maxLoan, USDC_DECIMALS, 0) + ' USDC';
-
-    const seal = $('complianceSeal');
-    const eligible = profile.kycVerified && !profile.restricted;
-    seal.className = 'seal ' + (eligible ? 'verified' : 'pending');
-    $('complianceTierText').textContent = eligible ? TIER_NAMES[tierNum] || '—' : 'waiting';
-
-    $('depositHint').textContent = eligible
-      ? 'collateral/The loan must be in the ceiling LTV and the ceiling tier (' + (TIER_NAMES[tierNum] || '') + ') be.'
-      : 'First you have to KYC to be able to get a loan.';
-
-    const attIdCheck = $('inAttestationId').value.trim();
-    if (attIdCheck) {
-      const { attestation } = contracts();
-      const validAtt = await attestation.isValid(BigInt(attIdCheck), userAddress);
-      $('statAttestation').textContent = validAtt ? ('#' + attIdCheck + ' authentic ✓') : ('#' + attIdCheck + ' invalid');
-    }
-  } catch (e) {
-    console.error(e);
-    toast('error  and ‌I see — Check the address of the contracts in the settings.');
-  }
-}
-
-function addLedgerRow(action, status, hash) {
-  $('ledgerEmpty').style.display = 'none';
-  $('ledgerTable').style.display = 'table';
-  const tr = document.createElement('tr');
-  const link = hash ? `<a href="${ARC.explorer}/tx/${hash}" target="_blank" rel="noopener">${hash.slice(0,10)}…↗</a>` : '—';
-  const cls = status === 'successful' ? 'tx-ok' : status === 'successful' ? 'tx-fail' : 'tx-pending';
-  tr.innerHTML = `<td class="rtl-cell">${action}</td><td class="${cls}">${status}</td><td>${link}</td>`;
-  $('ledgerBody').prepend(tr);
-  return tr;
-}
-
-async function runTx(label, fn) {
-  const row = addLedgerRow(label, 'Sending…', null);
-  try {
-    const tx = await fn();
-    row.innerHTML = `<td class="rtl-cell">${label}</td><td class="tx-pending">Awaiting confirmation…</td><td class="mono">${tx.hash.slice(0,10)}…</td>`;
-    const receipt = await tx.wait();
-    const ok = receipt.status === 1;
-    row.innerHTML = `<td class="rtl-cell">${label}</td><td class="${ok ? 'tx-ok' : 'tx-fail'}">${ok ? 'successful' : 'successful'}</td>` +
-      `<td><a href="${ARC.explorer}/tx/${tx.hash}" target="_blank" rel="noopener">${tx.hash.slice(0,10)}…↗</a></td>`;
-    toast(label + (ok ? ' — successful ✓' : ' — successful'));
-    refreshAll();
-    return receipt;
-  } catch (e) {
-    row.innerHTML = `<td class="rtl-cell">${label}</td><td class="tx-fail">rejected</td><td>—</td>`;
-    toast('error: ' + (e.shortMessage || e.reason || e.message));
-    throw e;
-  }
-}
-
-$('btnSelfAttest').addEventListener('click', async () => {
-  if (!signer) return toast('and bag‌money  and .');
-  const { attestation } = contracts();
-  const hash = ethers.keccak256(ethers.toUtf8Bytes('demo-asset-' + Date.now()));
-  const receipt = await runTx('Self-attest', () => attestation.attest(userAddress, hash, 31536000n));
-  try {
-    for (const log of receipt.logs) {
+    window.connectWallet = async function() {
+      if (!window.ethereum) {
+        alert("لطفاً متامسک را متصل کنید.");
+        return;
+      }
       try {
-        const parsed = attestation.interface.parseLog(log);
-        if (parsed && parsed.name === 'AttestationIssued') {
-          $('inAttestationId').value = parsed.args.id.toString();
-          toast('Attestation ID you: ' + parsed.args.id.toString());
-          refreshAll();
-          break;
+        const provider = getWeb3Provider();
+        let accounts = await provider.send("eth_requestAccounts", []);
+        if (accounts && accounts.length > 0) {
+          currentAccount = accounts[0];
+          updateUIOnConnect(currentAccount);
         }
-      } catch (e) { /* not this event, skip */ }
-    }
-  } catch (e) { /* non-fatal: id just won't auto-fill */ }
-});
-
-$('btnSelfKyc').addEventListener('click', async () => {
-  if (!signer) return toast('and bag‌money  and .');
-  const { compliance } = contracts();
-  await runTx('Self-KYC (Retail)', () => compliance.setProfile(userAddress, true, 1, 31536000n));
-});
-
-$('btnDeposit').addEventListener('click', async () => {
-  if (!signer) return toast('and bag‌money  and .');
-  const collateral = ethers.parseUnits($('inCollateral').value || '0', RWA_DECIMALS);
-  const borrow = ethers.parseUnits($('inBorrow').value || '0', USDC_DECIMALS);
-  const attId = BigInt($('inAttestationId').value || '0');
-  if (collateral === 0n || borrow === 0n) return toast('Enter the collateral and loan amount.');
-  const { rwa, vault } = contracts();
-  const allowance = await rwa.allowance(userAddress, config.vault);
-  if (allowance < collateral) {
-    await runTx('Approve RWA collateral', () => rwa.approve(config.vault, collateral));
-  }
-  await runTx('and collateral + getting a loan', () => vault.depositRWAAndBorrow(collateral, borrow, attId));
-});
-
-$('btnRepay').addEventListener('click', async () => {
-  if (!signer) return toast('and bag‌money  and .');
-  const amount = ethers.parseUnits($('inRepay').value || '0', USDC_DECIMALS);
-  if (amount === 0n) return toast('Enter the refund amount.');
-  const { usdc, vault } = contracts();
-  const allowance = await usdc.allowance(userAddress, config.vault);
-  if (allowance < amount) {
-    await runTx('Approve USDC', () => usdc.approve(config.vault, amount));
-  }
-  await runTx('Manual refund', () => vault.repay(amount));
-});
-
-$('btnStartStream').addEventListener('click', async () => {
-  if (!signer) return toast('and bag‌money  and .');
-  const rate = ethers.parseUnits($('inFlowRate').value || '0', USDC_DECIMALS);
-  if (rate === 0n) return toast('Stream rate  and .');
-  const { usdc, vault } = contracts();
-  const allowance = await usdc.allowance(userAddress, config.vault);
-  if (allowance < ethers.MaxUint256 / 2n) {
-    await runTx('Approve USDC (Unlimited, for streaming)', () => usdc.approve(config.vault, ethers.MaxUint256));
-  }
-  await runTx('Start streaming', () => vault.startSelfPayingStream(rate));
-});
-
-$('btnSettleStream').addEventListener('click', async () => {
-  if (!signer) return toast('and bag‌money  and .');
-  const { vault } = contracts();
-  await runTx('Stream settlement', () => vault.settleStream(userAddress));
-});
-
-loadConfig();
-</script>
-
-<script>
-window.addEventListener('load', function() {
-    setTimeout(function() {
-        document.getElementById('cfgVault').value = '0x6f29286af2134afce4619038a2cd7a48666449d7';
-        document.getElementById('cfgAttestation').value = '0xE49151151A55a84909e581066233de33f4d0f396';
-        document.getElementById('cfgCompliance').value = '0x28b0fe105D3A936eA72791d5730991df8A0e6863';
-        document.getElementById('cfgRwa').value = '0x7306e00a86a1ceebeb99645ab7c9f5ef019d8751';
-        console.log("Addresses forced into inputs.");
-    }, 500);
-});
-</script>
-
-<script>
-window.addEventListener('DOMContentLoaded', function() {
-    function fillAndSave() {
-        const inputs = {
-            'cfgVault': '0x6f29286af2134afce4619038a2cd7a48666449d7',
-            'cfgAttestation': '0xE49151151A55a84909e581066233de33f4d0f396',
-            'cfgCompliance': '0x28b0fe105D3A936eA72791d5730991df8A0e6863',
-            'cfgRwa': '0x7306e00a86a1ceebeb99645ab7c9f5ef019d8751'
-        };
-        
-        for (let id in inputs) {
-            let el = document.getElementById(id);
-            if (el) {
-                el.value = inputs[id];
-                el.dispatchEvent(new Event('input', { bubbles: true }));
-                el.dispatchEvent(new Event('change', { bubbles: true }));
-            }
-        }
-        
-        let saveBtn = document.getElementById('btnSaveConfig');
-        if (saveBtn) {
-            saveBtn.click();
-        }
-    }
-
-    setTimeout(fillAndSave, 300);
-    setTimeout(fillAndSave, 1000);
-});
-</script>
-
-
-
-
-  <div style="background:#141a2e; padding:12px; border-radius:10px; border:1px solid #2a3358; margin-bottom:15px;">
-    <span style="font-size:11px; color:#8c99b2;"><!-- Active Wallet --></span>
-    <div style="font-family:monospace; font-size:12px; color:#c9a54e; margin-top:4px; word-break:break-all;"><span onclick="toggleWalletDrawer()" style="cursor:pointer; text-decoration:underline; color:#c9a54e;">0x99fd...ca44 ⚙️</span></div>
-  </div>
-  <div style="font-size:12px; color:#8c99b2; margin-bottom:8px;">Current Vault Holdings:</div>
-  <div style="display:flex; justify-content:space-between; font-size:13px; color:#fff; margin-bottom:8px; background:#0b0e1a; padding:8px; border-radius:8px;">
-    <span>MockRWA Collateral:</span><strong style="color:#2ebac6;">1.0 RWA</strong>
-  </div>
-  <div style="display:flex; justify-content:space-between; font-size:13px; color:#fff; margin-bottom:20px; background:#0b0e1a; padding:8px; border-radius:8px;">
-    <span>USDC Loan Debt:</span><strong style="color:#e3c878;">0.5 USDC</strong>
-  </div>
-  <button onclick="window.open('https://testnet.arcscan.io/address/0x99fdca44', '_blank')" style="width:100%; margin-bottom:10px; font-size:11px; padding:8px;">🔍 View Explorer on ArcScan</button>
-  <button onclick="toggleWalletDrawer()" style="width:100%; background: linear-gradient(135deg, #ff5252 0%, #c62828 100%) !important; color:#fff !important; font-size:11px; padding:8px;">Disconnect Session</button>
-</div>
-
-
-<div id="drawer-overlay" onclick="window.toggleWalletDrawer()" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.75); display:none; z-index:99998; backdrop-filter:blur(4px);"></div>
-<div id="wallet-drawer" style="position:fixed; top:0; right:-380px; width:320px; max-width:85vw; height:100%; background:#0b0e1a; border-left:1px solid #2a3358; box-shadow:-10px 0 30px rgba(0,0,0,0.85); z-index:99999; transition:right 0.3s ease; padding:22px; box-sizing:border-box; color:#fff; font-family:sans-serif;">
-  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-    <h4 style="margin:0; color:#fff; font-size:15px;">Account & Vault Status</h4>
-    <button onclick="window.toggleWalletDrawer()" style="background:none; border:none; color:#8c99b2; font-size:22px; cursor:pointer;">✕</button>
-  </div>
-  <div style="background:#141a2e; padding:12px; border-radius:10px; border:1px solid #2a3358; margin-bottom:15px;">
-    <span style="font-size:11px; color:#8c99b2;"><!-- Active Wallet --></span>
-    <div style="font-family:monospace; font-size:12px; color:#c9a54e; margin-top:4px; word-break:break-all;">0x99fd...ca44</div>
-  </div>
-  <div style="font-size:12px; color:#8c99b2; margin-bottom:8px;">Current Vault Holdings:</div>
-  <div style="display:flex; justify-content:space-between; font-size:13px; color:#fff; margin-bottom:8px; background:#0b0e1a; padding:10px; border-radius:8px;">
-    <span>MockRWA Collateral:</span><strong style="color:#2ebac6;">1.0 RWA</strong>
-  </div>
-  <div style="display:flex; justify-content:space-between; font-size:13px; color:#fff; margin-bottom:20px; background:#0b0e1a; padding:10px; border-radius:8px;">
-    <span>USDC Loan Debt:</span><strong style="color:#e3c878;">0.5 USDC</strong>
-  </div>
-  <button onclick="window.open('https://testnet.arcscan.io/address/0x99fdca44', '_blank')" style="width:100%; margin-bottom:10px; font-size:11px; padding:10px; background:#141a2e; border:1px solid #2a3358; color:#fff; border-radius:8px; cursor:pointer;">🔍 View Explorer on ArcScan</button>
-  <button onclick="window.toggleWalletDrawer()" style="width:100%; background:linear-gradient(135deg, #ff5252 0%, #c62828 100%); border:none; color:#fff; font-size:11px; padding:10px; border-radius:8px; cursor:pointer; font-weight:bold;">Disconnect Session</button>
-</div>
-
-<div id="toast-container" class="toast-container"></div>
-
-<!-- Drawer HTML & Script Fix -->
-<div id="drawer-overlay" style="position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.75); display:none; z-index:999988; backdrop-filter:blur(4px);"></div>
-
-<div id="wallet-drawer" style="position:fixed; top:0; right:-400px; width:330px; max-width:85vw; height:100vh; background:#0b0e1a; border-left:1px solid #2a3358; box-shadow:-10px 0 30px rgba(0,0,0,0.9); z-index:999999; transition:right 0.3s cubic-bezier(0.4, 0, 0.2, 1); padding:24px; box-sizing:border-box; color:#fff; font-family:sans-serif;">
-  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:1px solid #2a3358; padding-bottom:12px;">
-    <h4 style="margin:0; color:#fff; font-size:16px;">Account & Vault Status</h4>
-    <button id="close-drawer-btn" style="background:none; border:none; color:#8c99b2; font-size:24px; cursor:pointer; padding:0;">✕</button>
-  </div>
-  <div style="background:#141a2e; padding:14px; border-radius:10px; border:1px solid #2a3358; margin-bottom:15px;">
-    <span style="font-size:11px; color:#8c99b2; text-transform:uppercase;"><!-- Active Wallet --></span>
-    <div style="font-family:monospace; font-size:13px; color:#c9a54e; margin-top:6px; word-break:break-all;">0x99fd...ca44</div>
-  </div>
-  <div style="font-size:12px; color:#8c99b2; margin-bottom:10px;">Current Vault Holdings:</div>
-  <div style="display:flex; justify-content:space-between; font-size:13px; color:#fff; margin-bottom:10px; background:#0b0e1a; padding:12px; border-radius:8px; border:1px solid #141a2e;">
-    <span>MockRWA Collateral:</span><strong style="color:#2ebac6;">1.0 RWA</strong>
-  </div>
-  <div style="display:flex; justify-content:space-between; font-size:13px; color:#fff; margin-bottom:24px; background:#0b0e1a; padding:12px; border-radius:8px; border:1px solid #141a2e;">
-    <span>USDC Loan Debt:</span><strong style="color:#e3c878;">0.5 USDC</strong>
-  </div>
-  <button onclick="window.open('https://testnet.arcscan.io/address/0x99fdca44', '_blank')" style="width:100%; margin-bottom:12px; font-size:12px; padding:12px; background:#141a2e; border:1px solid #2a3358; color:#fff; border-radius:8px; cursor:pointer; font-weight:600;">🔍 View Explorer on ArcScan</button>
-  <button id="disconnect-btn" style="width:100%; background:linear-gradient(135deg, #ff5252 0%, #c62828 100%); border:none; color:#fff; font-size:12px; padding:12px; border-radius:8px; cursor:pointer; font-weight:bold;">Disconnect Session</button>
-</div>
-
-<!-- Ethers.js Web3 Library -->
-
-<div id="toast-container" class="toast-container"></div>
-<div id="drawer-overlay" onclick="window.toggleWalletDrawer(false)"></div>
-<div id="wallet-drawer">
-  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:1px solid #2a3358; padding-bottom:12px;">
-    <h4 style="margin:0; color:#fff; font-size:16px;">Account & Vault Status</h4>
-    <button onclick="window.toggleWalletDrawer(false)" style="background:none; border:none; color:#8c99b2; font-size:24px; cursor:pointer;">✕</button>
-  </div>
-  <div style="background:#141a2e; padding:14px; border-radius:10px; border:1px solid #2a3358; margin-bottom:15px;">
-    <span style="font-size:11px; color:#8c99b2; text-transform:uppercase;"><!-- Active Wallet --></span>
-    <div id="drawer-wallet-address" style="font-family:monospace; font-size:13px; color:#c9a54e; margin-top:6px; word-break:break-all;">Not Connected</div>
-  </div>
-  <div style="font-size:12px; color:#8c99b2; margin-bottom:10px;">Current Vault Holdings:</div>
-  <div style="display:flex; justify-content:space-between; font-size:13px; color:#fff; margin-bottom:10px; background:#0b0e1a; padding:12px; border-radius:8px; border:1px solid #141a2e;">
-    <span>MockRWA Balance:</span><strong id="drawer-rwa-bal" style="color:#2ebac6;">0.0 RWA</strong>
-  </div>
-  <div style="display:flex; justify-content:space-between; font-size:13px; color:#fff; margin-bottom:24px; background:#0b0e1a; padding:12px; border-radius:8px; border:1px solid #141a2e;">
-    <span>USDC Loan Debt:</span><strong style="color:#e3c878;">0.0 USDC</strong>
-  </div>
-  <button id="drawer-explorer-btn" onclick="window.open('https://testnet.arcscan.io', '_blank')" style="width:100%; margin-bottom:12px; font-size:12px; padding:12px; background:#141a2e; border:1px solid #2a3358; color:#fff; border-radius:8px; cursor:pointer; font-weight:600;">🔍 View Explorer on ArcScan</button>
-  <button onclick="window.disconnectWallet()" style="width:100%; background:linear-gradient(135deg, #ff5252 0%, #c62828 100%); border:none; color:#fff; font-size:12px; padding:12px; border-radius:8px; cursor:pointer; font-weight:bold;">Disconnect Session</button>
-</div>
-
-
-
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
-<script id="arc-master-unified-engine">
-(function() {
-    console.log("Arc Master Engine Initialized...");
-    window.toggleWalletDrawer = function(show) {
-        const drawer = document.getElementById("wallet-drawer");
-        if(drawer) drawer.style.right = show ? "0px" : "-400px";
-    };
-    
-    // اطمینان از عملکرد دکمه‌ها
-    document.querySelectorAll("button").forEach(btn => {
-        btn.addEventListener("click", function(e) {
-            const txt = this.innerText.toLowerCase();
-            if(txt.includes("connect")) window.connectWallet ? window.connectWallet() : alert("Wait for load...");
-        });
-    });
-})();
-</script>
-
-
-<script id="arc-master-ui-modern">
-(function() {
-    // ایجاد ساختار جدید در هدر
-    const header = document.querySelector(".header") || document.querySelector("div");
-    
-    window.toggleSettings = function() {
-        const menu = document.getElementById("settings-menu");
-        menu.style.display = (menu.style.display === "block") ? "none" : "block";
+      } catch (e) {
+        console.error(e);
+      }
     };
 
-    window.updateHeaderUI = function(addr) {
-        const container = document.getElementById("wallet-header-container");
-        if(!container) return;
-        
-        const short = addr.slice(0, 6) + "..." + addr.slice(-4);
-        container.innerHTML = `
-            <div style="display:flex; align-items:center; background:#141a2e; padding:8px 15px; border-radius:20px; border:1px solid #2a3358;">
-                <span style="color:#c9a54e; font-family:monospace; margin-right:10px;">${short}</span>
-                <span class="settings-trigger" onclick="window.toggleSettings()">⚙️</span>
-            </div>
-            <div id="settings-menu" class="wallet-settings-menu">
-                <div style="color:#fff; font-size:12px; margin-bottom:10px;">Dashboard</div>
-                <div style="color:#2ebac6; font-size:14px; margin-bottom:15px;">Balance: <span id="menu-rwa-bal">Loading...</span></div>
-                <button onclick="window.disconnectWallet()" style="width:100%; padding:8px; background:#c62828; color:white; border:none; border-radius:5px; cursor:pointer;">Disconnect</button>
-            </div>
-        `;
-        // آپدیت موجودی
-        window.syncBalance(addr).then(bal => {
-            document.getElementById("menu-rwa-bal").innerText = bal + " MockRWA";
-        });
-    };
-})();
-</script>
-
-
-<script id="arc-manual-wallet-logic">
-(function() {
     window.disconnectWallet = function() {
-        if (typeof currentAccount !== 'undefined') {
-            currentAccount = null;
-        }
-        
-        // Reset Header Connect Button
-        const btns = document.querySelectorAll("button");
-        btns.forEach(btn => {
-            if (btn.innerText.includes("0x") || btn.innerText.toLowerCase().includes("disconnect")) {
-                btn.innerText = "Connect Wallet";
-                btn.onclick = function() { if (window.connectWallet) window.connectWallet(); };
-            }
-        });
-
-        const menu = document.getElementById("settings-menu");
-        if (menu) menu.style.display = "none";
-        
-        if (window.showToast) window.showToast("Session disconnected", "🔌");
+      currentAccount = null;
+      const headerContainer = document.getElementById("wallet-header-container");
+      if (headerContainer) {
+        headerContainer.innerHTML = '<button onclick="window.connectWallet()" class="btn-gold" style="width: auto; padding: 10px 24px;">Connect Wallet</button>';
+      }
+      window.toggleSettings(false);
     };
-})();
-</script>
 
+    function updateUIOnConnect(addr) {
+      const short = addr.slice(0, 6) + "..." + addr.slice(-4);
+      const headerContainer = document.getElementById("wallet-header-container");
+      if (headerContainer) {
+        headerContainer.innerHTML = `
+          <div style="display:flex; align-items:center; background:#161824; border:1px solid var(--border-gold); padding:8px 16px; border-radius:20px; gap:10px;">
+            <span style="font-family:'JetBrains Mono'; color:var(--gold-primary); font-weight:600; font-size:13px;">${short}</span>
+            <span onclick="window.toggleSettings()" style="cursor:pointer; font-size:16px;">⚙️</span>
+          </div>
+        `;
+      }
+      document.getElementById("menu-wallet-addr").innerText = addr;
+      window.syncBalance(addr);
+    }
+
+    window.syncBalance = async function(addr) {
+      try {
+        const provider = getWeb3Provider();
+        if (!provider) return "0.0";
+        const signer = await provider.getSigner();
+        const contract = new ethers.Contract(MOCK_RWA_ADDRESS, MOCK_RWA_ABI, signer);
+        const bal = await contract.balanceOf(addr);
+        const formatted = ethers.formatUnits ? ethers.formatUnits(bal, 18) : ethers.utils.formatUnits(bal, 18);
+        const fixedBal = parseFloat(formatted).toFixed(1);
+        
+        const menuBal = document.getElementById("menu-rwa-bal");
+        if (menuBal) menuBal.innerText = `${fixedBal} MockRWA`;
+        
+        const dispBal = document.getElementById("display-rwa-bal");
+        if (dispBal) dispBal.innerText = `Bal: ${fixedBal}`;
+        
+        return fixedBal;
+      } catch (e) {
+        console.error(e);
+        return "0.0";
+      }
+    };
+
+    window.executeFaucetMint = async function() {
+      if (!window.ethereum) return alert("کیف‌پول متصل نیست");
+      try {
+        const provider = getWeb3Provider();
+        const signer = await provider.getSigner();
+        const userAddr = currentAccount || (await signer.getAddress());
+        
+        const contract = new ethers.Contract(MOCK_RWA_ADDRESS, MOCK_RWA_ABI, signer);
+        const amount = ethers.parseUnits ? ethers.parseUnits("100", 18) : ethers.utils.parseUnits("100", 18);
+        
+        const tx = await contract.mint(userAddr, amount);
+        await tx.wait();
+        
+        alert("۱۰۰ توکن MockRWA با موفقیت مینت شد!");
+        addTxToHistory("Faucet Mint", "100.0 MockRWA", tx.hash);
+        window.syncBalance(userAddr);
+      } catch (e) {
+        console.error(e);
+        alert("خطا در تراکنش");
+      }
+    };
+
+    window.executeDeposit = function() {
+      const amt = document.getElementById("deposit-amount").value || "1.0";
+      alert(`واریز ${amt} MockRWA به ولت شبیه‌سازی شد!`);
+      addTxToHistory("Collateral Supply", `${amt} MockRWA`, "0x...");
+    };
+
+    window.executeBorrow = function() {
+      const amt = document.getElementById("borrow-amount").value || "600.0";
+      alert(`دریافت وام ${amt} USDC ثبت شد!`);
+      addTxToHistory("Borrow Loan", `${amt} USDC`, "0x...");
+    };
+
+    function addTxToHistory(event, amount, hash) {
+      const tbody = document.getElementById("activity-tbody");
+      if (!tbody) return;
+      const shortHash = hash ? (hash.slice(0, 6) + "..." + hash.slice(-4)) : "0x...";
+      const row = `
+        <tr>
+          <td style="color: var(--gold-primary); font-weight: 600;">${event}</td>
+          <td>${amount}</td>
+          <td>Just now</td>
+          <td><a href="https://testnet.arcscan.io/tx/${hash}" target="_blank" class="tx-link">${shortHash} ↗</a></td>
+        </tr>
+      `;
+      tbody.insertAdjacentHTML("afterbegin", row);
+    }
+  })();
+  </script>
 </body>
-
-
-
-
 </html>
-
