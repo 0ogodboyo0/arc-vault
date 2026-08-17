@@ -7,7 +7,6 @@
 <title>Arc RWA Vault — Ledger</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.17.0/ethers.umd.min.js"></script>
 <style>
   :root {
     --ink: #0b0e1a;
@@ -200,76 +199,32 @@ localStorage.setItem('rwaAddress', '0x7306e00a86a1ceebeb99645ab7c9f5ef019d8751')
 
 
 
-<style id="arc-vault-v5-final">
-  .metrics-banner {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-    gap: 12px;
-    margin: 15px 0 20px 0;
-  }
-  .metric-card {
-    background: #141a2e; border: 1px solid #2a3358;
-    border-radius: 12px; padding: 12px; text-align: center;
-  }
-  .metric-title { font-size: 11px; color: #8c99b2; text-transform: uppercase; letter-spacing: 0.5px; }
-  .metric-value { font-size: 16px; font-weight: bold; color: #c9a54e; margin-top: 4px; }
 
-  /* Wallet Drawer Modal */
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
+<style id="arc-master-v6-css">
   #wallet-drawer {
-    position: fixed; top: 0; right: -360px; width: 320px; height: 100%;
-    background: #0b0e1a; border-left: 1px solid #2a3358;
-    box-shadow: -10px 0 30px rgba(0,0,0,0.85); z-index: 10000;
-    transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1); padding: 22px;
-    box-sizing: border-box;
+    position: fixed !important; top: 0 !important; right: -400px !important; width: 330px !important;
+    max-width: 85vw !important; height: 100vh !important; background: #0b0e1a !important;
+    border-left: 1px solid #2a3358 !important; box-shadow: -10px 0 30px rgba(0,0,0,0.9) !important;
+    z-index: 999999 !important; transition: right 0.3s ease !important; padding: 24px !important;
+    box-sizing: border-box !important; color: #fff !important; font-family: sans-serif !important;
   }
-  #wallet-drawer.open { right: 0 !important; }
-  .drawer-overlay {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.65); display: none; z-index: 9999;
-    backdrop-filter: blur(3px);
+  #drawer-overlay {
+    position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important;
+    height: 100vh !important; background: rgba(0,0,0,0.75) !important; display: none !important;
+    z-index: 999998 !important; backdrop-filter: blur(4px) !important;
   }
-
-  .risk-bar-bg { background: #0b0e1a; height: 10px; border-radius: 5px; overflow: hidden; margin-top: 8px; border: 1px solid #2a3358; }
-  .risk-bar-fill { height: 100%; width: 88%; background: linear-gradient(90deg, #ff5252 0%, #e3c878 40%, #2ebac6 100%); }
-  #yieldCanvas { width: 100%; height: 110px; background: #0b0e1a; border-radius: 8px; border: 1px solid #2a3358; margin-top: 10px; }
-  .activity-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 10px; text-align: left; }
-  .activity-table th { color: #8c99b2; border-bottom: 1px solid #2a3358; padding: 8px; font-weight: normal; }
-  .activity-table td { color: #f5f7fa; border-bottom: 1px solid #141a2e; padding: 8px; }
-  .tx-link { color: #c9a54e; text-decoration: none; font-weight: bold; }
-  .sec-banner {
-    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;
-    background: #141a2e; border: 1px dashed #2a3358; padding: 10px 14px;
-    border-radius: 10px; font-size: 11px; color: #8c99b2; margin: 15px 0;
+  .toast-container {
+    position: fixed; bottom: 20px; right: 20px; z-index: 999999;
+    display: flex; flex-direction: column; gap: 10px;
   }
-</style>
-
-
-<style id="arc-v5-master-ui">
-  .metrics-banner {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-    gap: 12px; margin: 15px 0 20px 0;
+  .toast {
+    background: #141a2e; border: 1px solid #2ebac6; color: #fff;
+    padding: 12px 18px; border-radius: 8px; font-size: 12px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 8px;
+    animation: slideIn 0.3s ease forwards;
   }
-  .metric-card {
-    background: #141a2e; border: 1px solid #2a3358;
-    border-radius: 12px; padding: 12px; text-align: center;
-  }
-  .metric-title { font-size: 11px; color: #8c99b2; text-transform: uppercase; letter-spacing: 0.5px; }
-  .metric-value { font-size: 16px; font-weight: bold; color: #c9a54e; margin-top: 4px; }
-
-  .sec-banner {
-    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;
-    background: #141a2e; border: 1px dashed #2a3358; padding: 10px 14px;
-    border-radius: 10px; font-size: 11px; color: #8c99b2; margin: 15px 0;
-  }
-
-  .risk-bar-bg { background: #0b0e1a; height: 10px; border-radius: 5px; overflow: hidden; margin-top: 8px; border: 1px solid #2a3358; }
-  .risk-bar-fill { height: 100%; width: 88%; background: linear-gradient(90deg, #ff5252 0%, #e3c878 40%, #2ebac6 100%); }
-  #yieldCanvas { width: 100%; height: 110px; background: #0b0e1a; border-radius: 8px; border: 1px solid #2a3358; margin-top: 10px; }
-  
-  .activity-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 10px; text-align: left; }
-  .activity-table th { color: #8c99b2; border-bottom: 1px solid #2a3358; padding: 8px; font-weight: normal; }
-  .activity-table td { color: #f5f7fa; border-bottom: 1px solid #141a2e; padding: 8px; }
-  .tx-link { color: #c9a54e; text-decoration: none; font-weight: bold; }
+  @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 </style>
 
 </head>
@@ -868,12 +823,7 @@ window.addEventListener('DOMContentLoaded', function() {
 
 
 
-<div id="drawer-overlay" class="drawer-overlay" onclick="toggleWalletDrawer()"></div>
-<div id="wallet-drawer">
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-    <h4 style="margin:0; color:#fff; font-size:15px;">Account & Vault Status</h4>
-    <button onclick="toggleWalletDrawer()" style="background:none; border:none; color:#8c99b2; font-size:18px; cursor:pointer;">✕</button>
-  </div>
+
   <div style="background:#141a2e; padding:12px; border-radius:10px; border:1px solid #2a3358; margin-bottom:15px;">
     <span style="font-size:11px; color:#8c99b2;">Active Wallet</span>
     <div style="font-family:monospace; font-size:12px; color:#c9a54e; margin-top:4px; word-break:break-all;"><span onclick="toggleWalletDrawer()" style="cursor:pointer; text-decoration:underline; color:#c9a54e;">0x99fd...ca44 ⚙️</span></div>
@@ -888,59 +838,6 @@ window.addEventListener('DOMContentLoaded', function() {
   <button onclick="window.open('https://testnet.arcscan.io/address/0x99fdca44', '_blank')" style="width:100%; margin-bottom:10px; font-size:11px; padding:8px;">🔍 View Explorer on ArcScan</button>
   <button onclick="toggleWalletDrawer()" style="width:100%; background: linear-gradient(135deg, #ff5252 0%, #c62828 100%) !important; color:#fff !important; font-size:11px; padding:8px;">Disconnect Session</button>
 </div>
-
-
-<script id="arc-vault-v5-final-js">
-  function toggleWalletDrawer() {
-    const drawer = document.getElementById("wallet-drawer");
-    const overlay = document.getElementById("drawer-overlay");
-    if (!drawer || !overlay) return;
-    if (drawer.classList.contains("open")) {
-      drawer.classList.remove("open");
-      overlay.style.display = "none";
-    } else {
-      drawer.classList.add("open");
-      overlay.style.display = "block";
-    }
-  }
-
-  function renderYieldChart() {
-    const canvas = document.getElementById("yieldCanvas");
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    const w = canvas.width = canvas.offsetWidth;
-    const h = canvas.height = canvas.offsetHeight;
-    ctx.clearRect(0, 0, w, h);
-
-    ctx.beginPath();
-    ctx.strokeStyle = "#c9a54e";
-    ctx.lineWidth = 2;
-    ctx.moveTo(10, h - 15);
-    ctx.bezierCurveTo(w * 0.3, h - 25, w * 0.6, h - 65, w - 10, 15);
-    ctx.stroke();
-
-    ctx.beginPath();
-    ctx.strokeStyle = "#2ebac6";
-    ctx.lineWidth = 1.5;
-    ctx.setLineDash([4, 4]);
-    ctx.moveTo(10, 25);
-    ctx.lineTo(w - 10, h - 15);
-    ctx.stroke();
-    ctx.setLineDash([]);
-
-    ctx.fillStyle = "#8c99b2";
-    ctx.font = "10px sans-serif";
-    ctx.fillText("📈 Yield Growth (8.5% APY)", 15, 25);
-    ctx.fillText("⚡ Auto Repay Stream", w - 120, h - 8);
-  }
-
-  window.addEventListener("load", () => {
-    setTimeout(renderYieldChart, 400);
-  });
-</script>
-
-
-
 
 
 <div id="drawer-overlay" onclick="window.toggleWalletDrawer()" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.75); display:none; z-index:99998; backdrop-filter:blur(4px);"></div>
@@ -964,110 +861,7 @@ window.addEventListener('DOMContentLoaded', function() {
   <button onclick="window.toggleWalletDrawer()" style="width:100%; background:linear-gradient(135deg, #ff5252 0%, #c62828 100%); border:none; color:#fff; font-size:11px; padding:10px; border-radius:8px; cursor:pointer; font-weight:bold;">Disconnect Session</button>
 </div>
 
-<script id="arc-v5-master-engine">
-  window.toggleWalletDrawer = function() {
-    const drawer = document.getElementById("wallet-drawer");
-    const overlay = document.getElementById("drawer-overlay");
-    if (!drawer || !overlay) return;
-    if (drawer.style.right === "0px") {
-      drawer.style.right = "-380px";
-      overlay.style.display = "none";
-    } else {
-      drawer.style.right = "0px";
-      overlay.style.display = "block";
-    }
-  };
-
-  function renderYieldChart() {
-    const canvas = document.getElementById("yieldCanvas");
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    const w = canvas.width = canvas.offsetWidth;
-    const h = canvas.height = canvas.offsetHeight;
-    ctx.clearRect(0, 0, w, h);
-
-    ctx.beginPath();
-    ctx.strokeStyle = "#c9a54e";
-    ctx.lineWidth = 2;
-    ctx.moveTo(10, h - 15);
-    ctx.bezierCurveTo(w * 0.3, h - 25, w * 0.6, h - 65, w - 10, 15);
-    ctx.stroke();
-
-    ctx.beginPath();
-    ctx.strokeStyle = "#2ebac6";
-    ctx.lineWidth = 1.5;
-    ctx.setLineDash([4, 4]);
-    ctx.moveTo(10, 25);
-    ctx.lineTo(w - 10, h - 15);
-    ctx.stroke();
-    ctx.setLineDash([]);
-
-    ctx.fillStyle = "#8c99b2";
-    ctx.font = "10px sans-serif";
-    ctx.fillText("📈 Yield Growth (8.5% APY)", 15, 25);
-    ctx.fillText("⚡ Auto Repay Stream", w - 120, h - 8);
-  }
-
-  window.addEventListener("load", () => {
-    setTimeout(renderYieldChart, 400);
-    document.querySelectorAll("*").forEach(el => {
-      if (el.children.length === 0 && (el.innerText.includes("0x99fd") || el.innerText.includes("ca44"))) {
-        el.style.cursor = "pointer";
-        el.onclick = (e) => { e.preventDefault(); window.toggleWalletDrawer(); };
-      }
-    });
-  });
-</script>
-
-
-<style id="arc-interactive-ui">
-  .toast-container {
-    position: fixed; bottom: 20px; right: 20px; z-index: 999999;
-    display: flex; flex-direction: column; gap: 10px;
-  }
-  .toast {
-    background: #141a2e; border: 1px solid #2ebac6; color: #fff;
-    padding: 12px 18px; border-radius: 8px; font-size: 12px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 8px;
-    animation: slideIn 0.3s ease forwards;
-  }
-  @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-</style>
-
 <div id="toast-container" class="toast-container"></div>
-
-<script id="arc-interactive-engine">
-  function showToast(msg, icon = "✅") {
-    const container = document.getElementById("toast-container");
-    if (!container) return;
-    const toast = document.createElement("div");
-    toast.className = "toast";
-    toast.innerHTML = `<span>${icon}</span> <span>${msg}</span>`;
-    container.appendChild(toast);
-    setTimeout(() => {
-      toast.style.opacity = "0";
-      toast.style.transition = "opacity 0.3s ease";
-      setTimeout(() => toast.remove(), 300);
-    }, 3000);
-  }
-
-  // Bind toast notifications to common buttons
-  document.addEventListener("DOMContentLoaded", () => {
-    document.querySelectorAll("button").forEach(btn => {
-      btn.addEventListener("click", (e) => {
-        const text = btn.innerText.toLowerCase();
-        if (text.includes("mint") || text.includes("faucet")) {
-          showToast("MockRWA & Test USDC minted to your wallet!", "🪙");
-        } else if (text.includes("save")) {
-          showToast("Vault registry addresses updated successfully!", "⚙️");
-        } else if (text.includes("confirm") || text.includes("deposit")) {
-          showToast("Collateral deposit transaction submitted to Arc Scan!", "🚀");
-        }
-      });
-    });
-  });
-</script>
-
 
 <!-- Drawer HTML & Script Fix -->
 <div id="drawer-overlay" style="position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.75); display:none; z-index:999988; backdrop-filter:blur(4px);"></div>
@@ -1092,132 +886,206 @@ window.addEventListener('DOMContentLoaded', function() {
   <button id="disconnect-btn" style="width:100%; background:linear-gradient(135deg, #ff5252 0%, #c62828 100%); border:none; color:#fff; font-size:12px; padding:12px; border-radius:8px; cursor:pointer; font-weight:bold;">Disconnect Session</button>
 </div>
 
-<script id="arc-drawer-fix-final">
+<!-- Ethers.js Web3 Library -->
+
+<div id="toast-container" class="toast-container"></div>
+<div id="drawer-overlay" onclick="window.toggleWalletDrawer(false)"></div>
+<div id="wallet-drawer">
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:1px solid #2a3358; padding-bottom:12px;">
+    <h4 style="margin:0; color:#fff; font-size:16px;">Account & Vault Status</h4>
+    <button onclick="window.toggleWalletDrawer(false)" style="background:none; border:none; color:#8c99b2; font-size:24px; cursor:pointer;">✕</button>
+  </div>
+  <div style="background:#141a2e; padding:14px; border-radius:10px; border:1px solid #2a3358; margin-bottom:15px;">
+    <span style="font-size:11px; color:#8c99b2; text-transform:uppercase;">Active Wallet</span>
+    <div id="drawer-wallet-address" style="font-family:monospace; font-size:13px; color:#c9a54e; margin-top:6px; word-break:break-all;">Not Connected</div>
+  </div>
+  <div style="font-size:12px; color:#8c99b2; margin-bottom:10px;">Current Vault Holdings:</div>
+  <div style="display:flex; justify-content:space-between; font-size:13px; color:#fff; margin-bottom:10px; background:#0b0e1a; padding:12px; border-radius:8px; border:1px solid #141a2e;">
+    <span>MockRWA Balance:</span><strong id="drawer-rwa-bal" style="color:#2ebac6;">0.0 RWA</strong>
+  </div>
+  <div style="display:flex; justify-content:space-between; font-size:13px; color:#fff; margin-bottom:24px; background:#0b0e1a; padding:12px; border-radius:8px; border:1px solid #141a2e;">
+    <span>USDC Loan Debt:</span><strong style="color:#e3c878;">0.0 USDC</strong>
+  </div>
+  <button id="drawer-explorer-btn" onclick="window.open('https://testnet.arcscan.io', '_blank')" style="width:100%; margin-bottom:12px; font-size:12px; padding:12px; background:#141a2e; border:1px solid #2a3358; color:#fff; border-radius:8px; cursor:pointer; font-weight:600;">🔍 View Explorer on ArcScan</button>
+  <button onclick="window.disconnectWallet()" style="width:100%; background:linear-gradient(135deg, #ff5252 0%, #c62828 100%); border:none; color:#fff; font-size:12px; padding:12px; border-radius:8px; cursor:pointer; font-weight:bold;">Disconnect Session</button>
+</div>
+
+<script id="arc-master-unified-engine">
 (function() {
-  function toggleDrawer(show) {
+  const MOCK_RWA_ADDRESS = "0x7306e00a86a1ceebeb99645ab7c9f5ef019d8751";
+  const MOCK_RWA_ABI = [
+    "function mint(address to, uint256 amount) public",
+    "function balanceOf(address account) public view returns (uint256)"
+  ];
+
+  let currentAccount = null;
+
+  window.showToast = function(msg, icon = "✅") {
+    const container = document.getElementById("toast-container");
+    if (!container) return;
+    const toast = document.createElement("div");
+    toast.className = "toast";
+    toast.innerHTML = `<span>${icon}</span> <span>${msg}</span>`;
+    container.appendChild(toast);
+    setTimeout(() => {
+      toast.style.opacity = "0";
+      toast.style.transition = "opacity 0.3s ease";
+      setTimeout(() => toast.remove(), 3500);
+    }, 3500);
+  };
+
+  function getWeb3Provider() {
+    if (!window.ethereum) return null;
+    if (typeof ethers.BrowserProvider !== "undefined") {
+      return new ethers.BrowserProvider(window.ethereum);
+    } else if (ethers.providers && ethers.providers.Web3Provider) {
+      return new ethers.providers.Web3Provider(window.ethereum);
+    }
+    return null;
+  }
+
+  window.toggleWalletDrawer = function(show) {
     const drawer = document.getElementById("wallet-drawer");
     const overlay = document.getElementById("drawer-overlay");
     if (!drawer || !overlay) return;
-    
-    if (show === undefined) {
-      show = drawer.style.right !== "0px";
+    if (show === undefined) show = drawer.style.right !== "0px";
+    drawer.style.right = show ? "0px" : "-400px";
+    overlay.style.display = show ? "block" : "none";
+  };
+
+  window.connectWallet = async function() {
+    if (!window.ethereum) {
+      showToast("لطفا متامسک را نصب یا فعال کنید", "⚠️");
+      return;
     }
-    
-    if (show) {
-      drawer.style.right = "0px";
-      overlay.style.display = "block";
-    } else {
-      drawer.style.right = "-400px";
-      overlay.style.display = "none";
+    try {
+      const provider = getWeb3Provider();
+      let accounts;
+      if (provider.send) {
+        accounts = await provider.send("eth_requestAccounts", []);
+      } else {
+        accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+      }
+      if (accounts && accounts.length > 0) {
+        currentAccount = accounts[0];
+        updateUIOnConnect(currentAccount);
+        showToast("ولِت با موفقیت متصل شد!", "🦊");
+      }
+    } catch (err) {
+      console.error(err);
+      showToast("خطا در اتصال به ولِت", "❌");
+    }
+  };
+
+  window.disconnectWallet = function() {
+    currentAccount = null;
+    document.querySelectorAll("button, span").forEach(el => {
+      if (el.children.length === 0 && (el.innerText.includes("0x") || el.innerText.toLowerCase().includes("connect"))) {
+        el.innerText = "Connect Wallet";
+      }
+    });
+    document.getElementById("drawer-wallet-address").innerText = "Not Connected";
+    document.getElementById("drawer-rwa-bal").innerText = "0.0 RWA";
+    window.toggleWalletDrawer(false);
+    showToast("ارتباط ولِت قطع شد.", "🔌");
+  };
+
+  function updateUIOnConnect(addr) {
+    const short = addr.slice(0, 6) + "..." + addr.slice(-4);
+    document.querySelectorAll("button, span").forEach(el => {
+      if (el.children.length === 0 && (el.innerText.toLowerCase().includes("connect wallet") || el.innerText.includes("0x"))) {
+        el.innerText = short;
+      }
+    });
+    document.getElementById("drawer-wallet-address").innerText = addr;
+    document.getElementById("drawer-explorer-btn").onclick = () => window.open(`https://testnet.arcscan.io/address/${addr}`, "_blank");
+    syncBalance(addr);
+  }
+
+  async function syncBalance(addr) {
+    try {
+      const provider = getWeb3Provider();
+      if (!provider) return;
+      const signer = await provider.getSigner();
+      const contract = new ethers.Contract(MOCK_RWA_ADDRESS, MOCK_RWA_ABI, signer);
+      const bal = await contract.balanceOf(addr);
+      const formatted = ethers.formatUnits ? ethers.formatUnits(bal, 18) : ethers.utils.formatUnits(bal, 18);
+      document.getElementById("drawer-rwa-bal").innerText = `${parseFloat(formatted).toFixed(1)} MockRWA`;
+    } catch (e) {
+      console.error("Balance sync error:", e);
     }
   }
 
-  // شنود سراسری کلیک روی کل صفحه (Event Delegation)
+  window.executeFaucetMint = async function() {
+    if (!window.ethereum) {
+      showToast("کیف‌پول متصل نیست!", "⚠️");
+      return;
+    }
+    try {
+      const provider = getWeb3Provider();
+      const signer = await provider.getSigner();
+      const userAddr = currentAccount || (await signer.getAddress());
+
+      showToast("تایید تراکنش مینت در ولت...", "⏳");
+      const contract = new ethers.Contract(MOCK_RWA_ADDRESS, MOCK_RWA_ABI, signer);
+      
+      const amount = ethers.parseUnits ? ethers.parseUnits("100", 18) : ethers.utils.parseUnits("100", 18);
+      const tx = await contract.mint(userAddr, amount);
+      
+      showToast("تراکنش به شبکه Arc ارسال شد", "📡");
+      await tx.wait();
+      showToast("۱۰۰ توکن MockRWA با موفقیت مینت شد!", "🎉");
+
+      addTxToHistory("Mint Faucet", "100.0 MockRWA", tx.hash || "0x...");
+      syncBalance(userAddr);
+    } catch (err) {
+      console.error(err);
+      showToast("خطا در تراکنش Faucet", "❌");
+    }
+  };
+
+  function addTxToHistory(event, amount, hash) {
+    const table = document.querySelector(".activity-table tbody") || document.querySelector("table tbody");
+    if (!table) return;
+    const shortHash = hash ? (hash.slice(0, 6) + "..." + hash.slice(-4)) : "0x...";
+    const rowHTML = `
+      <tr>
+        <td style="color:#2ebac6; font-weight:bold;">${event}</td>
+        <td>${amount}</td>
+        <td>Just now</td>
+        <td><a href="https://testnet.arcscan.io/tx/${hash}" target="_blank" class="tx-link">${shortHash} ↗</a></td>
+      </tr>
+    `;
+    table.insertAdjacentHTML("afterbegin", rowHTML);
+  }
+
   document.addEventListener("click", function(e) {
-    const text = e.target.innerText || "";
-    const isWalletBtn = e.target.closest("[id*='wallet']") || text.includes("0x99fd") || text.includes("ca44");
+    const txt = (e.target.innerText || "").toLowerCase();
     
-    if (isWalletBtn && !e.target.closest("#wallet-drawer")) {
+    if (txt.includes("mint") || txt.includes("faucet")) {
       e.preventDefault();
       e.stopPropagation();
-      toggleDrawer(true);
-    }
-    
-    if (e.target.id === "drawer-overlay" || e.target.id === "close-drawer-btn" || e.target.id === "disconnect-btn") {
-      toggleDrawer(false);
-    }
-  }, true);
-
-  window.toggleWalletDrawer = function() { toggleDrawer(); };
-})();
-</script>
-
-
-<!-- Ethers.js Web3 Library -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
-
-<script id="arc-web3-real-logic">
-  // آدرس‌های واقعی قراردادهای دپلوی‌شده شما روی Arc Testnet
-  const MOCK_RWA_ADDRESS = "0x7306e00a86a1ceebeb99645ab7c9f5ef019d8751";
-  const VAULT_ADDRESS = "0x6f29286af2134afce4619038a2cd7a48666449d7";
-
-  const MOCK_RWA_ABI = [
-    "function mint(address to, uint256 amount) public",
-    "function balanceOf(address account) public view returns (uint256)",
-    "function decimals() public view returns (uint8)"
-  ];
-
-  // اتصال به ولت و فراخوانی واقعی متد Mint
-  async function executeRealFaucet() {
-    if (!window.ethereum) {
-      if (window.showToast) showToast("لطفاً متامسک یا کیف‌پول Web3 را فعال کنید!", "⚠️");
-      else alert("لطفاً متامسک را متصل کنید.");
+      window.executeFaucetMint();
       return;
     }
 
-    try {
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      await provider.send("eth_requestAccounts", []);
-      const signer = provider.getSigner();
-      const userAddress = await signer.getAddress();
-
-      if (window.showToast) showToast("در حال تایید تراکنش در ولت...", "⏳");
-
-      const rwaContract = new ethers.Contract(MOCK_RWA_ADDRESS, MOCK_RWA_ABI, signer);
-
-      // ارسال واقعی تراکنش به شبکه Arc (مینت ۱۰۰ توکن تست)
-      const tx = await rwaContract.mint(userAddress, ethers.utils.parseUnits("100", 18));
-      if (window.showToast) showToast("تراکنش به بلاک‌چین ارسال شد...", "📡");
-
-      await tx.wait(); // انتظار برای تایید در بلاک
-      if (window.showToast) showToast("۱۰۰ توکن MockRWA با موفقیت مینت شد!", "🎉");
-
-      // به‌روزرسانی موجودی در صفحه
-      syncBalance(userAddress, provider);
-    } catch (err) {
-      console.error(err);
-      const errMsg = err.reason || err.message || "خطا در تراکنش";
-      if (window.showToast) showToast(`خطا: ${errMsg.slice(0, 35)}...`, "❌");
-    }
-  }
-
-  // خواندن واقعی موجودی از شبکه
-  async function syncBalance(address, provider) {
-    try {
-      const rwaContract = new ethers.Contract(MOCK_RWA_ADDRESS, MOCK_RWA_ABI, provider);
-      const rawBal = await rwaContract.balanceOf(address);
-      const formattedBal = ethers.utils.formatUnits(rawBal, 18);
-      
-      document.querySelectorAll("*").forEach(el => {
-        if (el.children.length === 0 && (el.innerText.includes("1.0 RWA") || el.innerText.includes("MockRWA"))) {
-          el.innerText = `${parseFloat(formattedBal).toFixed(1)} MockRWA`;
-        }
-      });
-    } catch (e) {
-      console.error("Error fetching balance:", e);
-    }
-  }
-
-  // اتصال اکشن به تمامی دکمه‌های Faucet / Mint
-  function bindFaucetButtons() {
-    document.querySelectorAll("button").forEach(btn => {
-      const txt = btn.innerText.toLowerCase();
-      if (txt.includes("mint") || txt.includes("faucet")) {
-        btn.onclick = (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          executeRealFaucet();
-        };
+    const isWalletBtn = e.target.closest("[id*='wallet']") || txt.includes("connect wallet") || (txt.includes("0x") && txt.length < 18);
+    if (isWalletBtn && !e.target.closest("#wallet-drawer")) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (!currentAccount) {
+        window.connectWallet();
+      } else {
+        window.toggleWalletDrawer(true);
       }
-    });
-  }
+    }
+  }, true);
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", bindFaucetButtons);
-  } else {
-    bindFaucetButtons();
+  if (window.ethereum && window.ethereum.selectedAddress) {
+    currentAccount = window.ethereum.selectedAddress;
+    updateUIOnConnect(currentAccount);
   }
-  setTimeout(bindFaucetButtons, 1000);
+})();
 </script>
 
 </body>
