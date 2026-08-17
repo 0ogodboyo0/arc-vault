@@ -1135,5 +1135,142 @@ window.addEventListener('DOMContentLoaded', function() {
 
 </body>
 
+
+<script id="arc-force-ui-engine">
+(function() {
+  // 1. تزریق استایل‌های CSS به هد
+  const style = document.createElement('style');
+  style.innerHTML = `
+    .metrics-banner {
+      display: grid !important;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)) !important;
+      gap: 12px !important; margin: 15px !important;
+    }
+    .metric-card {
+      background: #141a2e !important; border: 1px solid #2a3358 !important;
+      border-radius: 12px !important; padding: 12px !important; text-align: center !important;
+    }
+    .metric-title { font-size: 11px !important; color: #8c99b2 !important; text-transform: uppercase !important; }
+    .metric-value { font-size: 16px !important; font-weight: bold !important; color: #c9a54e !important; margin-top: 4px !important; }
+    
+    .sec-banner {
+      display: flex !important; justify-content: space-between !important; align-items: center !important;
+      flex-wrap: wrap !important; gap: 8px !important; background: #141a2e !important;
+      border: 1px dashed #2a3358 !important; padding: 10px 14px !important; border-radius: 10px !important;
+      font-size: 11px !important; color: #8c99b2 !important; margin: 0 15px 15px 15px !important;
+    }
+    #wallet-drawer {
+      position: fixed !important; top: 0 !important; right: -380px !important; width: 320px !important;
+      max-width: 85vw !important; height: 100% !important; background: #0b0e1a !important;
+      border-left: 1px solid #2a3358 !important; box-shadow: -10px 0 30px rgba(0,0,0,0.85) !important;
+      z-index: 999999 !important; transition: right 0.3s ease !important; padding: 22px !important;
+      box-sizing: border-box !important; color: #fff !important; font-family: sans-serif !important;
+    }
+    #drawer-overlay {
+      position: fixed !important; top: 0 !important; left: 0 !important; width: 100% !important;
+      height: 100% !important; background: rgba(0,0,0,0.75) !important; display: none !important;
+      z-index: 999998 !important; backdrop-filter: blur(4px) !important;
+    }
+  `;
+  document.head.appendChild(style);
+
+  // 2. ساخت مدال کشویی ولت
+  function buildWalletDrawer() {
+    if (document.getElementById("wallet-drawer")) return;
+    
+    const overlay = document.createElement("div");
+    overlay.id = "drawer-overlay";
+    overlay.onclick = window.toggleWalletDrawer;
+    
+    const drawer = document.createElement("div");
+    drawer.id = "wallet-drawer";
+    drawer.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <h4 style="margin:0; color:#fff; font-size:15px;">Account & Vault Status</h4>
+        <button onclick="window.toggleWalletDrawer()" style="background:none; border:none; color:#8c99b2; font-size:22px; cursor:pointer;">✕</button>
+      </div>
+      <div style="background:#141a2e; padding:12px; border-radius:10px; border:1px solid #2a3358; margin-bottom:15px;">
+        <span style="font-size:11px; color:#8c99b2;">Active Wallet</span>
+        <div style="font-family:monospace; font-size:12px; color:#c9a54e; margin-top:4px; word-break:break-all;">0x99fd...ca44</div>
+      </div>
+      <div style="font-size:12px; color:#8c99b2; margin-bottom:8px;">Current Vault Holdings:</div>
+      <div style="display:flex; justify-content:space-between; font-size:13px; color:#fff; margin-bottom:8px; background:#0b0e1a; padding:10px; border-radius:8px;">
+        <span>MockRWA Collateral:</span><strong style="color:#2ebac6;">1.0 RWA</strong>
+      </div>
+      <div style="display:flex; justify-content:space-between; font-size:13px; color:#fff; margin-bottom:20px; background:#0b0e1a; padding:10px; border-radius:8px;">
+        <span>USDC Loan Debt:</span><strong style="color:#e3c878;">0.5 USDC</strong>
+      </div>
+      <button onclick="window.open('https://testnet.arcscan.io/address/0x99fdca44', '_blank')" style="width:100%; margin-bottom:10px; font-size:11px; padding:10px; background:#141a2e; border:1px solid #2a3358; color:#fff; border-radius:8px; cursor:pointer;">🔍 View Explorer on ArcScan</button>
+      <button onclick="window.toggleWalletDrawer()" style="width:100%; background:linear-gradient(135deg, #ff5252 0%, #c62828 100%); border:none; color:#fff; font-size:11px; padding:10px; border-radius:8px; cursor:pointer; font-weight:bold;">Disconnect Session</button>
+    `;
+    
+    document.body.appendChild(overlay);
+    document.body.appendChild(drawer);
+  }
+
+  window.toggleWalletDrawer = function() {
+    buildWalletDrawer();
+    const drawer = document.getElementById("wallet-drawer");
+    const overlay = document.getElementById("drawer-overlay");
+    if (drawer.style.right === "0px") {
+      drawer.style.right = "-380px";
+      overlay.style.display = "none";
+    } else {
+      drawer.style.right = "0px";
+      overlay.style.display = "block";
+    }
+  };
+
+  // 3. ساخت داشبورد آمار و بنر امنیت
+  function buildDashboard() {
+    if (document.querySelector(".metrics-banner")) return;
+
+    const metricsHTML = `
+      <div class="metrics-banner">
+        <div class="metric-card"><div class="metric-title">Total Value Locked</div><div class="metric-value">$1,245,800</div></div>
+        <div class="metric-card"><div class="metric-title">Active Borrows</div><div class="metric-value">$412,000</div></div>
+        <div class="metric-card"><div class="metric-title">System LTV Ratio</div><div class="metric-value" style="color:#2ebac6;">302.3%</div></div>
+        <div class="metric-card"><div class="metric-title">Net APY Yield</div><div class="metric-value">8.5%</div></div>
+      </div>
+      <div class="sec-banner">
+        <span>🛡️ <strong>Emergency Pause:</strong> Normal (Active)</span>
+        <span>🔐 <strong>Gov Multi-Sig:</strong> 0x71...88a (3/5)</span>
+        <span>📡 <strong>Oracle Sync:</strong> Chainlink Live</span>
+      </div>
+    `;
+
+    const container = document.querySelector("main") || document.body;
+    container.insertAdjacentHTML("afterbegin", metricsHTML);
+  }
+
+  // 4. اتصال اکشن کلیک به تمام دکمه‌های ولت
+  function attachWalletClicks() {
+    buildWalletDrawer();
+    document.querySelectorAll("*").forEach(el => {
+      if (el.children.length === 0 && (el.innerText.includes("0x99fd") || el.innerText.includes("ca44"))) {
+        el.style.cursor = "pointer";
+        el.onclick = (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          window.toggleWalletDrawer();
+        };
+      }
+    });
+  }
+
+  function initAll() {
+    buildDashboard();
+    attachWalletClicks();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initAll);
+  } else {
+    initAll();
+  }
+  setTimeout(initAll, 800);
+})();
+</script>
+
 </html>
 
