@@ -227,7 +227,15 @@ localStorage.setItem('rwaAddress', '0x7306e00a86a1ceebeb99645ab7c9f5ef019d8751')
   @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 </style>
 
-</head>
+<style>
+#active-wallet-container { display: none !important; }
+.wallet-settings-menu {
+    position: absolute; top: 60px; right: 20px; background: #0b0e1a;
+    border: 1px solid #2a3358; border-radius: 12px; padding: 15px;
+    width: 250px; display: none; z-index: 1000; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+.settings-trigger { cursor: pointer; margin-left: 10px; font-size: 20px; }
+</style></head>
 <body>
 
 <div class="wrap">
@@ -825,7 +833,7 @@ window.addEventListener('DOMContentLoaded', function() {
 
 
   <div style="background:#141a2e; padding:12px; border-radius:10px; border:1px solid #2a3358; margin-bottom:15px;">
-    <span style="font-size:11px; color:#8c99b2;">Active Wallet</span>
+    <span style="font-size:11px; color:#8c99b2;"><!-- Active Wallet --></span>
     <div style="font-family:monospace; font-size:12px; color:#c9a54e; margin-top:4px; word-break:break-all;"><span onclick="toggleWalletDrawer()" style="cursor:pointer; text-decoration:underline; color:#c9a54e;">0x99fd...ca44 ⚙️</span></div>
   </div>
   <div style="font-size:12px; color:#8c99b2; margin-bottom:8px;">Current Vault Holdings:</div>
@@ -847,7 +855,7 @@ window.addEventListener('DOMContentLoaded', function() {
     <button onclick="window.toggleWalletDrawer()" style="background:none; border:none; color:#8c99b2; font-size:22px; cursor:pointer;">✕</button>
   </div>
   <div style="background:#141a2e; padding:12px; border-radius:10px; border:1px solid #2a3358; margin-bottom:15px;">
-    <span style="font-size:11px; color:#8c99b2;">Active Wallet</span>
+    <span style="font-size:11px; color:#8c99b2;"><!-- Active Wallet --></span>
     <div style="font-family:monospace; font-size:12px; color:#c9a54e; margin-top:4px; word-break:break-all;">0x99fd...ca44</div>
   </div>
   <div style="font-size:12px; color:#8c99b2; margin-bottom:8px;">Current Vault Holdings:</div>
@@ -872,7 +880,7 @@ window.addEventListener('DOMContentLoaded', function() {
     <button id="close-drawer-btn" style="background:none; border:none; color:#8c99b2; font-size:24px; cursor:pointer; padding:0;">✕</button>
   </div>
   <div style="background:#141a2e; padding:14px; border-radius:10px; border:1px solid #2a3358; margin-bottom:15px;">
-    <span style="font-size:11px; color:#8c99b2; text-transform:uppercase;">Active Wallet</span>
+    <span style="font-size:11px; color:#8c99b2; text-transform:uppercase;"><!-- Active Wallet --></span>
     <div style="font-family:monospace; font-size:13px; color:#c9a54e; margin-top:6px; word-break:break-all;">0x99fd...ca44</div>
   </div>
   <div style="font-size:12px; color:#8c99b2; margin-bottom:10px;">Current Vault Holdings:</div>
@@ -896,7 +904,7 @@ window.addEventListener('DOMContentLoaded', function() {
     <button onclick="window.toggleWalletDrawer(false)" style="background:none; border:none; color:#8c99b2; font-size:24px; cursor:pointer;">✕</button>
   </div>
   <div style="background:#141a2e; padding:14px; border-radius:10px; border:1px solid #2a3358; margin-bottom:15px;">
-    <span style="font-size:11px; color:#8c99b2; text-transform:uppercase;">Active Wallet</span>
+    <span style="font-size:11px; color:#8c99b2; text-transform:uppercase;"><!-- Active Wallet --></span>
     <div id="drawer-wallet-address" style="font-family:monospace; font-size:13px; color:#c9a54e; margin-top:6px; word-break:break-all;">Not Connected</div>
   </div>
   <div style="font-size:12px; color:#8c99b2; margin-bottom:10px;">Current Vault Holdings:</div>
@@ -929,6 +937,41 @@ window.addEventListener('DOMContentLoaded', function() {
             if(txt.includes("connect")) window.connectWallet ? window.connectWallet() : alert("Wait for load...");
         });
     });
+})();
+</script>
+
+
+<script id="arc-master-ui-modern">
+(function() {
+    // ایجاد ساختار جدید در هدر
+    const header = document.querySelector(".header") || document.querySelector("div");
+    
+    window.toggleSettings = function() {
+        const menu = document.getElementById("settings-menu");
+        menu.style.display = (menu.style.display === "block") ? "none" : "block";
+    };
+
+    window.updateHeaderUI = function(addr) {
+        const container = document.getElementById("wallet-header-container");
+        if(!container) return;
+        
+        const short = addr.slice(0, 6) + "..." + addr.slice(-4);
+        container.innerHTML = `
+            <div style="display:flex; align-items:center; background:#141a2e; padding:8px 15px; border-radius:20px; border:1px solid #2a3358;">
+                <span style="color:#c9a54e; font-family:monospace; margin-right:10px;">${short}</span>
+                <span class="settings-trigger" onclick="window.toggleSettings()">⚙️</span>
+            </div>
+            <div id="settings-menu" class="wallet-settings-menu">
+                <div style="color:#fff; font-size:12px; margin-bottom:10px;">Dashboard</div>
+                <div style="color:#2ebac6; font-size:14px; margin-bottom:15px;">Balance: <span id="menu-rwa-bal">Loading...</span></div>
+                <button onclick="window.disconnectWallet()" style="width:100%; padding:8px; background:#c62828; color:white; border:none; border-radius:5px; cursor:pointer;">Disconnect</button>
+            </div>
+        `;
+        // آپدیت موجودی
+        window.syncBalance(addr).then(bal => {
+            document.getElementById("menu-rwa-bal").innerText = bal + " MockRWA";
+        });
+    };
 })();
 </script>
 
