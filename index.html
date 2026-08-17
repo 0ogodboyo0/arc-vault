@@ -910,6 +910,74 @@ window.addEventListener('DOMContentLoaded', function() {
   });
 </script>
 
+
+<script id="wallet-drawer-engine">
+(function() {
+  function initWalletDrawer() {
+    if (!document.getElementById("wallet-drawer")) {
+      const drawerHTML = `
+        <div id="drawer-overlay" onclick="window.toggleWalletDrawer()" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.75); display:none; z-index:99998; backdrop-filter:blur(4px);"></div>
+        <div id="wallet-drawer" style="position:fixed; top:0; right:-380px; width:320px; max-width:85vw; height:100%; background:#0b0e1a; border-left:1px solid #2a3358; box-shadow:-10px 0 30px rgba(0,0,0,0.85); z-index:99999; transition:right 0.3s ease; padding:22px; box-sizing:border-box; color:#fff; font-family:sans-serif;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <h4 style="margin:0; color:#fff; font-size:15px;">Account & Vault Status</h4>
+            <button onclick="window.toggleWalletDrawer()" style="background:none; border:none; color:#8c99b2; font-size:22px; cursor:pointer; padding:0;">✕</button>
+          </div>
+          <div style="background:#141a2e; padding:12px; border-radius:10px; border:1px solid #2a3358; margin-bottom:15px;">
+            <span style="font-size:11px; color:#8c99b2;">Active Wallet</span>
+            <div style="font-family:monospace; font-size:12px; color:#c9a54e; margin-top:4px; word-break:break-all;">0x99fd...ca44</div>
+          </div>
+          <div style="font-size:12px; color:#8c99b2; margin-bottom:8px;">Current Vault Holdings:</div>
+          <div style="display:flex; justify-content:space-between; font-size:13px; color:#fff; margin-bottom:8px; background:#0b0e1a; padding:10px; border-radius:8px;">
+            <span>MockRWA Collateral:</span><strong style="color:#2ebac6;">1.0 RWA</strong>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:13px; color:#fff; margin-bottom:20px; background:#0b0e1a; padding:10px; border-radius:8px;">
+            <span>USDC Loan Debt:</span><strong style="color:#e3c878;">0.5 USDC</strong>
+          </div>
+          <button onclick="window.open('https://testnet.arcscan.io/address/0x99fdca44', '_blank')" style="width:100%; margin-bottom:10px; font-size:11px; padding:10px; background:#141a2e; border:1px solid #2a3358; color:#fff; border-radius:8px; cursor:pointer;">🔍 View Explorer on ArcScan</button>
+          <button onclick="window.toggleWalletDrawer()" style="width:100%; background:linear-gradient(135deg, #ff5252 0%, #c62828 100%); border:none; color:#fff; font-size:11px; padding:10px; border-radius:8px; cursor:pointer; font-weight:bold;">Disconnect Session</button>
+        </div>
+      `;
+      document.body.insertAdjacentHTML('beforeend', drawerHTML);
+    }
+  }
+
+  window.toggleWalletDrawer = function() {
+    initWalletDrawer();
+    const drawer = document.getElementById("wallet-drawer");
+    const overlay = document.getElementById("drawer-overlay");
+    if (drawer.style.right === "0px") {
+      drawer.style.right = "-380px";
+      overlay.style.display = "none";
+    } else {
+      drawer.style.right = "0px";
+      overlay.style.display = "block";
+    }
+  };
+
+  function bindWalletButtons() {
+    initWalletDrawer();
+    document.querySelectorAll("*").forEach(el => {
+      if (el.children.length === 0 && (el.innerText.includes("0x99fd") || el.innerText.includes("ca44") || el.id === "wallet-btn")) {
+        el.style.cursor = "pointer";
+        el.style.pointerEvents = "auto";
+        el.onclick = function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          window.toggleWalletDrawer();
+        };
+      }
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", bindWalletButtons);
+  } else {
+    bindWalletButtons();
+  }
+  setTimeout(bindWalletButtons, 1000);
+})();
+</script>
+
 </body>
 
 </html>
