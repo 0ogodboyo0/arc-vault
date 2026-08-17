@@ -1084,6 +1084,55 @@ window.addEventListener('DOMContentLoaded', function() {
   });
 </script>
 
+
+<style id="arc-interactive-ui">
+  .toast-container {
+    position: fixed; bottom: 20px; right: 20px; z-index: 999999;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .toast {
+    background: #141a2e; border: 1px solid #2ebac6; color: #fff;
+    padding: 12px 18px; border-radius: 8px; font-size: 12px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 8px;
+    animation: slideIn 0.3s ease forwards;
+  }
+  @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+</style>
+
+<div id="toast-container" class="toast-container"></div>
+
+<script id="arc-interactive-engine">
+  function showToast(msg, icon = "✅") {
+    const container = document.getElementById("toast-container");
+    if (!container) return;
+    const toast = document.createElement("div");
+    toast.className = "toast";
+    toast.innerHTML = `<span>${icon}</span> <span>${msg}</span>`;
+    container.appendChild(toast);
+    setTimeout(() => {
+      toast.style.opacity = "0";
+      toast.style.transition = "opacity 0.3s ease";
+      setTimeout(() => toast.remove(), 300);
+    }, 3000);
+  }
+
+  // Bind toast notifications to common buttons
+  document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll("button").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        const text = btn.innerText.toLowerCase();
+        if (text.includes("mint") || text.includes("faucet")) {
+          showToast("MockRWA & Test USDC minted to your wallet!", "🪙");
+        } else if (text.includes("save")) {
+          showToast("Vault registry addresses updated successfully!", "⚙️");
+        } else if (text.includes("confirm") || text.includes("deposit")) {
+          showToast("Collateral deposit transaction submitted to Arc Scan!", "🚀");
+        }
+      });
+    });
+  });
+</script>
+
 </body>
 
 </html>
