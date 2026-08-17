@@ -975,6 +975,31 @@ window.addEventListener('DOMContentLoaded', function() {
 })();
 </script>
 
+
+<script id="arc-manual-wallet-logic">
+(function() {
+    window.disconnectWallet = function() {
+        if (typeof currentAccount !== 'undefined') {
+            currentAccount = null;
+        }
+        
+        // Reset Header Connect Button
+        const btns = document.querySelectorAll("button");
+        btns.forEach(btn => {
+            if (btn.innerText.includes("0x") || btn.innerText.toLowerCase().includes("disconnect")) {
+                btn.innerText = "Connect Wallet";
+                btn.onclick = function() { if (window.connectWallet) window.connectWallet(); };
+            }
+        });
+
+        const menu = document.getElementById("settings-menu");
+        if (menu) menu.style.display = "none";
+        
+        if (window.showToast) window.showToast("Session disconnected", "🔌");
+    };
+})();
+</script>
+
 </body>
 
 
