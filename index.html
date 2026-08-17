@@ -200,7 +200,7 @@ localStorage.setItem('rwaAddress', '0x7306e00a86a1ceebeb99645ab7c9f5ef019d8751')
 
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
+
 <style id="arc-master-v6-css">
   #wallet-drawer {
     position: fixed !important; top: 0 !important; right: -400px !important; width: 330px !important;
@@ -910,181 +910,25 @@ window.addEventListener('DOMContentLoaded', function() {
   <button onclick="window.disconnectWallet()" style="width:100%; background:linear-gradient(135deg, #ff5252 0%, #c62828 100%); border:none; color:#fff; font-size:12px; padding:12px; border-radius:8px; cursor:pointer; font-weight:bold;">Disconnect Session</button>
 </div>
 
+
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
 <script id="arc-master-unified-engine">
 (function() {
-  const MOCK_RWA_ADDRESS = "0x7306e00a86a1ceebeb99645ab7c9f5ef019d8751";
-  const MOCK_RWA_ABI = [
-    "function mint(address to, uint256 amount) public",
-    "function balanceOf(address account) public view returns (uint256)"
-  ];
-
-  let currentAccount = null;
-
-  window.showToast = function(msg, icon = "✅") {
-    const container = document.getElementById("toast-container");
-    if (!container) return;
-    const toast = document.createElement("div");
-    toast.className = "toast";
-    toast.innerHTML = `<span>${icon}</span> <span>${msg}</span>`;
-    container.appendChild(toast);
-    setTimeout(() => {
-      toast.style.opacity = "0";
-      toast.style.transition = "opacity 0.3s ease";
-      setTimeout(() => toast.remove(), 3500);
-    }, 3500);
-  };
-
-  function getWeb3Provider() {
-    if (!window.ethereum) return null;
-    if (typeof ethers.BrowserProvider !== "undefined") {
-      return new ethers.BrowserProvider(window.ethereum);
-    } else if (ethers.providers && ethers.providers.Web3Provider) {
-      return new ethers.providers.Web3Provider(window.ethereum);
-    }
-    return null;
-  }
-
-  window.toggleWalletDrawer = function(show) {
-    const drawer = document.getElementById("wallet-drawer");
-    const overlay = document.getElementById("drawer-overlay");
-    if (!drawer || !overlay) return;
-    if (show === undefined) show = drawer.style.right !== "0px";
-    drawer.style.right = show ? "0px" : "-400px";
-    overlay.style.display = show ? "block" : "none";
-  };
-
-  window.connectWallet = async function() {
-    if (!window.ethereum) {
-      showToast("لطفا متامسک را نصب یا فعال کنید", "⚠️");
-      return;
-    }
-    try {
-      const provider = getWeb3Provider();
-      let accounts;
-      if (provider.send) {
-        accounts = await provider.send("eth_requestAccounts", []);
-      } else {
-        accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
-      }
-      if (accounts && accounts.length > 0) {
-        currentAccount = accounts[0];
-        updateUIOnConnect(currentAccount);
-        showToast("ولِت با موفقیت متصل شد!", "🦊");
-      }
-    } catch (err) {
-      console.error(err);
-      showToast("خطا در اتصال به ولِت", "❌");
-    }
-  };
-
-  window.disconnectWallet = function() {
-    currentAccount = null;
-    document.querySelectorAll("button, span").forEach(el => {
-      if (el.children.length === 0 && (el.innerText.includes("0x") || el.innerText.toLowerCase().includes("connect"))) {
-        el.innerText = "Connect Wallet";
-      }
-    });
-    document.getElementById("drawer-wallet-address").innerText = "Not Connected";
-    document.getElementById("drawer-rwa-bal").innerText = "0.0 RWA";
-    window.toggleWalletDrawer(false);
-    showToast("ارتباط ولِت قطع شد.", "🔌");
-  };
-
-  function updateUIOnConnect(addr) {
-    const short = addr.slice(0, 6) + "..." + addr.slice(-4);
-    document.querySelectorAll("button, span").forEach(el => {
-      if (el.children.length === 0 && (el.innerText.toLowerCase().includes("connect wallet") || el.innerText.includes("0x"))) {
-        el.innerText = short;
-      }
-    });
-    document.getElementById("drawer-wallet-address").innerText = addr;
-    document.getElementById("drawer-explorer-btn").onclick = () => window.open(`https://testnet.arcscan.io/address/${addr}`, "_blank");
-    syncBalance(addr);
-  }
-
-  async function syncBalance(addr) {
-    try {
-      const provider = getWeb3Provider();
-      if (!provider) return;
-      const signer = await provider.getSigner();
-      const contract = new ethers.Contract(MOCK_RWA_ADDRESS, MOCK_RWA_ABI, signer);
-      const bal = await contract.balanceOf(addr);
-      const formatted = ethers.formatUnits ? ethers.formatUnits(bal, 18) : ethers.utils.formatUnits(bal, 18);
-      document.getElementById("drawer-rwa-bal").innerText = `${parseFloat(formatted).toFixed(1)} MockRWA`;
-    } catch (e) {
-      console.error("Balance sync error:", e);
-    }
-  }
-
-  window.executeFaucetMint = async function() {
-    if (!window.ethereum) {
-      showToast("کیف‌پول متصل نیست!", "⚠️");
-      return;
-    }
-    try {
-      const provider = getWeb3Provider();
-      const signer = await provider.getSigner();
-      const userAddr = currentAccount || (await signer.getAddress());
-
-      showToast("تایید تراکنش مینت در ولت...", "⏳");
-      const contract = new ethers.Contract(MOCK_RWA_ADDRESS, MOCK_RWA_ABI, signer);
-      
-      const amount = ethers.parseUnits ? ethers.parseUnits("100", 18) : ethers.utils.parseUnits("100", 18);
-      const tx = await contract.mint(userAddr, amount);
-      
-      showToast("تراکنش به شبکه Arc ارسال شد", "📡");
-      await tx.wait();
-      showToast("۱۰۰ توکن MockRWA با موفقیت مینت شد!", "🎉");
-
-      addTxToHistory("Mint Faucet", "100.0 MockRWA", tx.hash || "0x...");
-      syncBalance(userAddr);
-    } catch (err) {
-      console.error(err);
-      showToast("خطا در تراکنش Faucet", "❌");
-    }
-  };
-
-  function addTxToHistory(event, amount, hash) {
-    const table = document.querySelector(".activity-table tbody") || document.querySelector("table tbody");
-    if (!table) return;
-    const shortHash = hash ? (hash.slice(0, 6) + "..." + hash.slice(-4)) : "0x...";
-    const rowHTML = `
-      <tr>
-        <td style="color:#2ebac6; font-weight:bold;">${event}</td>
-        <td>${amount}</td>
-        <td>Just now</td>
-        <td><a href="https://testnet.arcscan.io/tx/${hash}" target="_blank" class="tx-link">${shortHash} ↗</a></td>
-      </tr>
-    `;
-    table.insertAdjacentHTML("afterbegin", rowHTML);
-  }
-
-  document.addEventListener("click", function(e) {
-    const txt = (e.target.innerText || "").toLowerCase();
+    console.log("Arc Master Engine Initialized...");
+    window.toggleWalletDrawer = function(show) {
+        const drawer = document.getElementById("wallet-drawer");
+        if(drawer) drawer.style.right = show ? "0px" : "-400px";
+    };
     
-    if (txt.includes("mint") || txt.includes("faucet")) {
-      e.preventDefault();
-      e.stopPropagation();
-      window.executeFaucetMint();
-      return;
-    }
-
-    const isWalletBtn = e.target.closest("[id*='wallet']") || txt.includes("connect wallet") || (txt.includes("0x") && txt.length < 18);
-    if (isWalletBtn && !e.target.closest("#wallet-drawer")) {
-      e.preventDefault();
-      e.stopPropagation();
-      if (!currentAccount) {
-        window.connectWallet();
-      } else {
-        window.toggleWalletDrawer(true);
-      }
-    }
-  }, true);
-
-  if (window.ethereum && window.ethereum.selectedAddress) {
-    currentAccount = window.ethereum.selectedAddress;
-    updateUIOnConnect(currentAccount);
-  }
+    // اطمینان از عملکرد دکمه‌ها
+    document.querySelectorAll("button").forEach(btn => {
+        btn.addEventListener("click", function(e) {
+            const txt = this.innerText.toLowerCase();
+            if(txt.includes("connect")) window.connectWallet ? window.connectWallet() : alert("Wait for load...");
+        });
+    });
 })();
 </script>
 
