@@ -195,273 +195,12 @@ localStorage.setItem('rwaAddress', '0x7306e00a86a1ceebeb99645ab7c9f5ef019d8751')
 
 
 
-<style id="arc-vault-custom-theme">
-  :root {
-    --bg-main: #0b0e1a !important;
-    --bg-card: #141a2e !important;
-    --bg-card-hover: #1c243f !important;
-    --border-color: #2a3358 !important;
-    --text-primary: #f5f7fa !important;
-    --text-secondary: #8c99b2 !important;
-    --accent-arc-gold: #c9a54e !important;
-    --accent-arc-soft: #e3c878 !important;
-    --accent-arc-glow: rgba(201, 165, 78, 0.3) !important;
-  }
-
-  body {
-    background-color: var(--bg-main) !important;
-    color: var(--text-primary) !important;
-    font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif !important;
-  }
-
-  /* Arc RWA Custom Cards */
-  .card, .panel, section, div[style*="background"] {
-    background-color: var(--bg-card) !important;
-    border: 1px solid var(--border-color) !important;
-    border-radius: 14px !important;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5) !important;
-  }
-
-  /* Headings & Text */
-  h1, h2, h3, h4, strong {
-    color: var(--text-primary) !important;
-    letter-spacing: -0.02em !important;
-  }
-
-  p, span, label {
-    color: var(--text-secondary);
-  }
-
-  /* Arc Gold Custom Buttons */
-  button {
-    background: linear-gradient(135deg, #c9a54e 0%, #9e7d30 100%) !important;
-    color: #0b0e1a !important;
-    border: none !important;
-    border-radius: 10px !important;
-    font-weight: 700 !important;
-    padding: 10px 18px !important;
-    cursor: pointer !important;
-    transition: all 0.2s ease-in-out !important;
-  }
-
-  button:hover {
-    background: linear-gradient(135deg, #e3c878 0%, #c9a54e 100%) !important;
-    transform: translateY(-1px) !important;
-    box-shadow: 0 4px 14px var(--accent-arc-glow) !important;
-  }
-
-  /* Inputs & Focus Glow */
-  input, select, textarea {
-    background-color: #0b0e1a !important;
-    border: 1px solid var(--border-color) !important;
-    border-radius: 10px !important;
-    color: #fff !important;
-    padding: 10px !important;
-  }
-
-  input:focus {
-    border-color: var(--accent-arc-gold) !important;
-    outline: none !important;
-    box-shadow: 0 0 8px var(--accent-arc-glow) !important;
-  }
-</style>
-
-
-
-<style id="arc-vault-micro-ui">
-  /* Card Hover Lift & Glow Effect */
-  .card, .panel, section, div[style*="background: #141a2e"] {
-    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s ease, border-color 0.25s ease !important;
-  }
-  .card:hover, .panel:hover, section:hover {
-    transform: translateY(-3px) !important;
-    border-color: rgba(201, 165, 78, 0.45) !important;
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.65), 0 0 12px rgba(201, 165, 78, 0.15) !important;
-  }
-
-  /* Shimmer Animation for Progress Bars */
-  div[style*="height: 10px"], .progress-bar {
-    position: relative;
-    overflow: hidden;
-  }
-  div[style*="height: 10px"]::after, .progress-bar::after {
-    content: "";
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: linear-gradient(90deg, transparent, rgba(227, 200, 120, 0.25), transparent);
-    animation: shimmer 2.2s infinite;
-  }
-  @keyframes shimmer {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
-  }
-
-  /* Smooth Inputs & Button Click Scale */
-  button:active {
-    transform: scale(0.97) !important;
-  }
-</style>
-
-
-<style id="arc-vault-pro-features">
-  /* Toast Notification Styling */
-  #toast-container {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    z-index: 9999;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  .arc-toast {
-    background: #141a2e;
-    border: 1px solid #c9a54e;
-    color: #fff;
-    padding: 12px 18px;
-    border-radius: 10px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.6);
-    font-size: 13px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    animation: slideIn 0.3s ease-out;
-  }
-  @keyframes slideIn {
-    from { transform: translateX(100%); opacity: 0; }
-    to { transform: translateX(0); opacity: 1; }
-  }
-
-  /* RWA Badge & Specs */
-  .badge-verified {
-    background: rgba(46, 186, 198, 0.15);
-    color: #2ebac6;
-    border: 1px solid #2ebac6;
-    padding: 3px 8px;
-    border-radius: 6px;
-    font-size: 11px;
-    font-weight: bold;
-  }
-  .rwa-spec-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-    gap: 10px;
-    margin-top: 10px;
-    font-size: 12px;
-  }
-  .rwa-spec-item {
-    background: #0b0e1a;
-    padding: 8px 10px;
-    border-radius: 8px;
-    border: 1px solid #2a3358;
-  }
-</style>
-
 <!-- Toast Container -->
 <div id="toast-container"></div>
 
 
-<style id="arc-vault-v3-ui">
-  /* Dynamic Health Colors */
-  .health-safe { color: #2ebac6 !important; }
-  .health-warning { color: #e3c878 !important; }
-  .health-danger { color: #ff5252 !important; }
 
-  /* Live Stream Ticker Display */
-  .ticker-box {
-    background: #0b0e1a;
-    border: 1px dashed #c9a54e;
-    padding: 10px;
-    border-radius: 8px;
-    font-family: monospace;
-    font-size: 13px;
-    color: #e3c878;
-    text-align: center;
-    margin-top: 10px;
-  }
-
-  /* Network Warning Banner */
-  #net-warning {
-    display: none;
-    background: rgba(255, 82, 82, 0.15);
-    border: 1px solid #ff5252;
-    color: #ff5252;
-    padding: 8px 12px;
-    border-radius: 8px;
-    font-size: 12px;
-    margin-bottom: 15px;
-    text-align: center;
-  }
-</style>
-
-
-<style id="arc-vault-v4-institutional">
-  /* Global Protocol Metrics Banner */
-  .metrics-banner {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-    gap: 12px;
-    margin: 15px 0 20px 0;
-  }
-  .metric-card {
-    background: #141a2e;
-    border: 1px solid #2a3358;
-    border-radius: 12px;
-    padding: 12px;
-    text-align: center;
-  }
-  .metric-title { font-size: 11px; color: #8c99b2; text-transform: uppercase; letter-spacing: 0.5px; }
-  .metric-value { font-size: 16px; font-weight: bold; color: #c9a54e; margin-top: 4px; }
-
-  /* RainbowKit Style Wallet Drawer Modal */
-  #wallet-drawer {
-    position: fixed; top: 0; right: -360px; width: 310px; height: 100%;
-    background: #0b0e1a; border-left: 1px solid #2a3358;
-    box-shadow: -10px 0 30px rgba(0,0,0,0.85); z-index: 10000;
-    transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1); padding: 22px;
-    box-sizing: border-box;
-  }
-  #wallet-drawer.open { right: 0; }
-  .drawer-overlay {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.65); display: none; z-index: 9999;
-    backdrop-filter: blur(3px);
-  }
-
-  /* Risk & Liquidation Bar */
-  .risk-bar-bg { background: #0b0e1a; height: 10px; border-radius: 5px; overflow: hidden; margin-top: 8px; border: 1px solid #2a3358; }
-  .risk-bar-fill { height: 100%; width: 88%; background: linear-gradient(90deg, #ff5252 0%, #e3c878 40%, #2ebac6 100%); }
-</style>
-
-
-<style id="arc-vault-v5-advanced">
-  /* Multi-Asset Selector & Risk Slider */
-  .asset-select {
-    width: 100%; padding: 10px; background: #0b0e1a; border: 1px solid #2a3358;
-    color: #f5f7fa; border-radius: 8px; font-size: 12px; margin-bottom: 12px;
-  }
-  .risk-slider-box { margin: 12px 0; background: #0b0e1a; padding: 10px; border-radius: 8px; border: 1px solid #1a233d; }
-  .risk-slider { width: 100%; accent-color: #c9a54e; cursor: pointer; }
-
-  /* Canvas Graph Styling */
-  #yieldCanvas { width: 100%; height: 110px; background: #0b0e1a; border-radius: 8px; border: 1px solid #2a3358; margin-top: 10px; }
-
-  /* On-Chain Activity Table */
-  .activity-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 10px; text-align: left; }
-  .activity-table th { color: #8c99b2; border-bottom: 1px solid #2a3358; padding: 8px; font-weight: normal; }
-  .activity-table td { color: #f5f7fa; border-bottom: 1px solid #141a2e; padding: 8px; }
-  .tx-link { color: #c9a54e; text-decoration: none; font-weight: bold; }
-
-  /* Multi-Sig Banner */
-  .sec-banner {
-    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;
-    background: #141a2e; border: 1px dashed #2a3358; padding: 10px 14px;
-    border-radius: 10px; font-size: 11px; color: #8c99b2; margin: 15px 0;
-  }
-</style>
-
-
-<style id="arc-vault-full-ui">
+<style id="arc-vault-v5-final">
   .metrics-banner {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
@@ -475,7 +214,7 @@ localStorage.setItem('rwaAddress', '0x7306e00a86a1ceebeb99645ab7c9f5ef019d8751')
   .metric-title { font-size: 11px; color: #8c99b2; text-transform: uppercase; letter-spacing: 0.5px; }
   .metric-value { font-size: 16px; font-weight: bold; color: #c9a54e; margin-top: 4px; }
 
-  /* Wallet Drawer Modal (RainbowKit Style) */
+  /* Wallet Drawer Modal */
   #wallet-drawer {
     position: fixed; top: 0; right: -360px; width: 320px; height: 100%;
     background: #0b0e1a; border-left: 1px solid #2a3358;
@@ -483,7 +222,7 @@ localStorage.setItem('rwaAddress', '0x7306e00a86a1ceebeb99645ab7c9f5ef019d8751')
     transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1); padding: 22px;
     box-sizing: border-box;
   }
-  #wallet-drawer.open { right: 0; }
+  #wallet-drawer.open { right: 0 !important; }
   .drawer-overlay {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background: rgba(0,0,0,0.65); display: none; z-index: 9999;
@@ -1091,166 +830,30 @@ window.addEventListener('DOMContentLoaded', function() {
 </script>
 
 
-<script id="arc-vault-pro-js">
-  // Self-Paying Yield Calculator
-  function updatePayoffSimulation() {
-    const deposit = parseFloat(document.getElementById("sim-deposit")?.value || 10000);
-    const debt = parseFloat(document.getElementById("sim-debt")?.value || 6000);
-    const apy = parseFloat(document.getElementById("sim-apy")?.value || 8.5);
-    
-    const annualYield = deposit * (apy / 100);
-    const monthsToPayoff = annualYield > 0 ? ((debt / annualYield) * 12).toFixed(1) : 0;
-    
-    document.getElementById("sim-res-yield").innerText = "$" + annualYield.toFixed(2) + " / yr";
-    document.getElementById("sim-res-months").innerText = monthsToPayoff + " Months";
-  }
 
-  // Toast Notification System
-  function showArcScanToast(txHash, msg) {
-    const container = document.getElementById("toast-container");
-    const toast = document.createElement("div");
-    toast.className = "arc-toast";
-    toast.innerHTML = `
-      <span>✅ ${msg}</span>
-      ${txHash ? `<a href="https://testnet.arcscan.io/tx/${txHash}" target="_blank" style="color:#c9a54e; text-decoration:underline;">View on ArcScan</a>` : ""}
-    `;
-    container.appendChild(toast);
-    setTimeout(() => toast.remove(), 5000);
-  }
-
-  // Download Vault Financial Statement
-  function downloadStatement() {
-    const statement = {
-      protocol: "ArcRWA Self-Paying Vault",
-      network: "Arc Testnet (5042002)",
-      timestamp: new Date().toISOString(),
-      compliance: "AML Cleared / Accredited Tier 1",
-      collateralAsset: "MockRWAToken (US T-Bills)",
-      collateralValue: "10,000 USD",
-      currentDebt: "600 USD",
-      healthFactor: "1200.00x",
-      status: "Active - Self-Paying Yield Stream"
-    };
-    const blob = new Blob([JSON.stringify(statement, null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "Arc_Vault_Statement.json";
-    a.click();
-    showArcScanToast(null, "Financial statement downloaded!");
-  }
-</script>
+<div id="drawer-overlay" class="drawer-overlay" onclick="toggleWalletDrawer()"></div>
+<div id="wallet-drawer">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <h4 style="margin:0; color:#fff; font-size:15px;">Account & Vault Status</h4>
+    <button onclick="toggleWalletDrawer()" style="background:none; border:none; color:#8c99b2; font-size:18px; cursor:pointer;">✕</button>
+  </div>
+  <div style="background:#141a2e; padding:12px; border-radius:10px; border:1px solid #2a3358; margin-bottom:15px;">
+    <span style="font-size:11px; color:#8c99b2;">Active Wallet</span>
+    <div style="font-family:monospace; font-size:12px; color:#c9a54e; margin-top:4px; word-break:break-all;"><span onclick="toggleWalletDrawer()" style="cursor:pointer; text-decoration:underline; color:#c9a54e;">0x99fd...ca44 ⚙️</span></div>
+  </div>
+  <div style="font-size:12px; color:#8c99b2; margin-bottom:8px;">Current Vault Holdings:</div>
+  <div style="display:flex; justify-content:space-between; font-size:13px; color:#fff; margin-bottom:8px; background:#0b0e1a; padding:8px; border-radius:8px;">
+    <span>MockRWA Collateral:</span><strong style="color:#2ebac6;">1.0 RWA</strong>
+  </div>
+  <div style="display:flex; justify-content:space-between; font-size:13px; color:#fff; margin-bottom:20px; background:#0b0e1a; padding:8px; border-radius:8px;">
+    <span>USDC Loan Debt:</span><strong style="color:#e3c878;">0.5 USDC</strong>
+  </div>
+  <button onclick="window.open('https://testnet.arcscan.io/address/0x99fdca44', '_blank')" style="width:100%; margin-bottom:10px; font-size:11px; padding:8px;">🔍 View Explorer on ArcScan</button>
+  <button onclick="toggleWalletDrawer()" style="width:100%; background: linear-gradient(135deg, #ff5252 0%, #c62828 100%) !important; color:#fff !important; font-size:11px; padding:8px;">Disconnect Session</button>
+</div>
 
 
-<script id="arc-vault-v3-js">
-  // Live Stream Repayment Ticker Effect
-  let streamBalance = 0.000000;
-  setInterval(() => {
-    streamBalance += 0.000015;
-    const el = document.getElementById("live-stream-ticker");
-    if(el) el.innerText = "+$" + streamBalance.toFixed(6) + " USDC Repaid";
-  }, 1000);
-
-  // Network Verification Check (Arc Testnet: 5042002 / 0x4cef0a)
-  async function checkArcNetwork() {
-    if (window.ethereum) {
-      const chainId = await window.ethereum.request({ method: "eth_chainId" });
-      const warningEl = document.getElementById("net-warning");
-      if (chainId !== "0x4cef0a" && chainId !== "5042002") {
-        if (warningEl) warningEl.style.display = "block";
-      } else {
-        if (warningEl) warningEl.style.display = "none";
-      }
-    }
-  }
-
-  // Auto Switch Network
-  async function switchToArcTestnet() {
-    if (window.ethereum) {
-      try {
-        await window.ethereum.request({
-          method: "wallet_switchEthereumChain",
-          params: [{ chainId: "0x4cef0a" }],
-        });
-      } catch (err) {
-        showArcScanToast(null, "Please manually switch to Arc Testnet in Metamask");
-      }
-    }
-  }
-
-  window.addEventListener("load", checkArcNetwork);
-</script>
-
-
-<script id="arc-vault-v4-js">
-  function toggleWalletDrawer() {
-    const drawer = document.getElementById("wallet-drawer");
-    const overlay = document.getElementById("drawer-overlay");
-    if (drawer.classList.contains("open")) {
-      drawer.classList.remove("open");
-      overlay.style.display = "none";
-    } else {
-      drawer.classList.add("open");
-      overlay.style.display = "block";
-    }
-  }
-</script>
-
-
-<script id="arc-vault-v5-js">
-  // Dynamic Risk Slider Calculator
-  function updateRiskCalc(val) {
-    const calcDisplay = document.getElementById("calc-health-val");
-    if (!calcDisplay) return;
-    const health = (1200 / (parseFloat(val) || 1)).toFixed(2);
-    calcDisplay.innerText = health + "x";
-    if (health < 1.5) calcDisplay.style.color = "#ff5252";
-    else if (health < 3.0) calcDisplay.style.color = "#e3c878";
-    else calcDisplay.style.color = "#2ebac6";
-  }
-
-  // Draw Smooth Lightweight Yield Graph on Canvas
-  function renderYieldChart() {
-    const canvas = document.getElementById("yieldCanvas");
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    const w = canvas.width = canvas.offsetWidth;
-    const h = canvas.height = canvas.offsetHeight;
-
-    ctx.clearRect(0, 0, w, h);
-
-    // Yield Curve (Gold)
-    ctx.beginPath();
-    ctx.strokeStyle = "#c9a54e";
-    ctx.lineWidth = 2;
-    ctx.moveTo(10, h - 15);
-    ctx.bezierCurveTo(w * 0.3, h - 25, w * 0.6, h - 65, w - 10, 15);
-    ctx.stroke();
-
-    // Debt Curve (Teal)
-    ctx.beginPath();
-    ctx.strokeStyle = "#2ebac6";
-    ctx.lineWidth = 1.5;
-    ctx.setLineDash([4, 4]);
-    ctx.moveTo(10, 25);
-    ctx.lineTo(w - 10, h - 15);
-    ctx.stroke();
-    ctx.setLineDash([]);
-
-    // Chart Labels
-    ctx.fillStyle = "#8c99b2";
-    ctx.font = "10px sans-serif";
-    ctx.fillText("📈 Yield Growth (8.5% APY)", 15, 25);
-    ctx.fillText("⚡ Auto Repay Stream", w - 120, h - 8);
-  }
-
-  window.addEventListener("load", () => {
-    setTimeout(renderYieldChart, 400);
-  });
-</script>
-
-
-<script id="arc-vault-full-js">
+<script id="arc-vault-v5-final-js">
   function toggleWalletDrawer() {
     const drawer = document.getElementById("wallet-drawer");
     const overlay = document.getElementById("drawer-overlay");
