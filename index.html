@@ -1132,6 +1132,94 @@ window.addEventListener('DOMContentLoaded', function() {
 })();
 </script>
 
+
+<!-- Ethers.js Web3 Library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+
+<script id="arc-web3-real-logic">
+  // آدرس‌های واقعی قراردادهای دپلوی‌شده شما روی Arc Testnet
+  const MOCK_RWA_ADDRESS = "0x7306e08a86a1ceebeb99645ab7c9f5ef019d8751";
+  const VAULT_ADDRESS = "0x6f29286af2134afce4619038a2cd7a48666449d7";
+
+  const MOCK_RWA_ABI = [
+    "function mint(address to, uint256 amount) public",
+    "function balanceOf(address account) public view returns (uint256)",
+    "function decimals() public view returns (uint8)"
+  ];
+
+  // اتصال به ولت و فراخوانی واقعی متد Mint
+  async function executeRealFaucet() {
+    if (!window.ethereum) {
+      if (window.showToast) showToast("لطفاً متامسک یا کیف‌پول Web3 را فعال کنید!", "⚠️");
+      else alert("لطفاً متامسک را متصل کنید.");
+      return;
+    }
+
+    try {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      await provider.send("eth_requestAccounts", []);
+      const signer = provider.getSigner();
+      const userAddress = await signer.getAddress();
+
+      if (window.showToast) showToast("در حال تایید تراکنش در ولت...", "⏳");
+
+      const rwaContract = new ethers.Contract(MOCK_RWA_ADDRESS, MOCK_RWA_ABI, signer);
+
+      // ارسال واقعی تراکنش به شبکه Arc (مینت ۱۰۰ توکن تست)
+      const tx = await rwaContract.mint(userAddress, ethers.utils.parseUnits("100", 18));
+      if (window.showToast) showToast("تراکنش به بلاک‌چین ارسال شد...", "📡");
+
+      await tx.wait(); // انتظار برای تایید در بلاک
+      if (window.showToast) showToast("۱۰۰ توکن MockRWA با موفقیت مینت شد!", "🎉");
+
+      // به‌روزرسانی موجودی در صفحه
+      syncBalance(userAddress, provider);
+    } catch (err) {
+      console.error(err);
+      const errMsg = err.reason || err.message || "خطا در تراکنش";
+      if (window.showToast) showToast(`خطا: ${errMsg.slice(0, 35)}...`, "❌");
+    }
+  }
+
+  // خواندن واقعی موجودی از شبکه
+  async function syncBalance(address, provider) {
+    try {
+      const rwaContract = new ethers.Contract(MOCK_RWA_ADDRESS, MOCK_RWA_ABI, provider);
+      const rawBal = await rwaContract.balanceOf(address);
+      const formattedBal = ethers.utils.formatUnits(rawBal, 18);
+      
+      document.querySelectorAll("*").forEach(el => {
+        if (el.children.length === 0 && (el.innerText.includes("1.0 RWA") || el.innerText.includes("MockRWA"))) {
+          el.innerText = `${parseFloat(formattedBal).toFixed(1)} MockRWA`;
+        }
+      });
+    } catch (e) {
+      console.error("Error fetching balance:", e);
+    }
+  }
+
+  // اتصال اکشن به تمامی دکمه‌های Faucet / Mint
+  function bindFaucetButtons() {
+    document.querySelectorAll("button").forEach(btn => {
+      const txt = btn.innerText.toLowerCase();
+      if (txt.includes("mint") || txt.includes("faucet")) {
+        btn.onclick = (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          executeRealFaucet();
+        };
+      }
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", bindFaucetButtons);
+  } else {
+    bindFaucetButtons();
+  }
+  setTimeout(bindFaucetButtons, 1000);
+</script>
+
 </body>
 
 
