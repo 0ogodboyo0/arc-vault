@@ -1072,6 +1072,48 @@ window.addEventListener('DOMContentLoaded', function() {
 })();
 </script>
 
+
+<script id="surgical-wallet-fix">
+(function() {
+  async function connectWalletEngine() {
+    if (typeof window.ethereum !== 'undefined') {
+      try {
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        const userAddr = accounts[0];
+        const shortAddr = userAddr.substring(0, 6) + '...' + userAddr.substring(userAddr.length - 4);
+        
+        // پیدا کردن دکمه ولت بدون تغییر لایاوت
+        const btn = document.querySelector("#wallet-btn") || 
+                    document.querySelector("#connect-btn") || 
+                    document.querySelector("button[onclick*='connect']") ||
+                    document.querySelector("header button");
+
+        if (btn) {
+          btn.innerText = shortAddr;
+        }
+        alert("✅ ولت متصل شد: " + userAddr);
+      } catch (err) {
+        alert("❌ خطا در اتصال: " + err.message);
+      }
+    } else {
+      alert("⚠️ مرورگر Web3 یافت نشد. لطفا سایت را داخل مرورگر اپلیکیشن MetaMask باز کنید.");
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", function() {
+    setTimeout(function() {
+      const btn = document.querySelector("#wallet-btn") || 
+                  document.querySelector("#connect-btn") || 
+                  document.querySelector("button[onclick*='connect']") ||
+                  document.querySelector("header button");
+      if (btn) {
+        btn.onclick = connectWalletEngine;
+      }
+    }, 300);
+  });
+})();
+</script>
+
 </body>
 
 
