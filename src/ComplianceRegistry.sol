@@ -23,23 +23,36 @@ contract ComplianceRegistry {
         AccreditationTier tier;
         uint64 verifiedAt;
         uint64 expiresAt;       // 0 = never expires
+        bytes32 attestationHash; // hash of the off-chain provider result; no PII is stored on-chain
     }
 
     address public owner;
     mapping(address => bool) public isComplianceOfficer;
+    mapping(address => bool) public isAttestationVerifier;
     mapping(address => Profile) public profiles;
+    mapping(address => uint256) public attestationNonces;
 
     /// @notice Maximum USDC (6 decimals) loan size permitted for each accreditation tier.
     mapping(AccreditationTier => uint256) public maxLoanForTier;
 
     event OwnerUpdated(address indexed newOwner);
     event OfficerUpdated(address indexed officer, bool allowed);
+    event AttestationVerifierUpdated(address indexed verifier, bool allowed);
     event ProfileUpdated(
         address indexed subject,
         bool kycVerified,
         AccreditationTier tier,
         uint64 expiresAt,
+        bytes32 attestationHash,
         address indexed updatedBy
+    );
+    event ProfileUpdatedByAttestation(
+        address indexed subject,
+        AccreditationTier tier,
+        uint64 expiresAt,
+        bytes32 attestationHash,
+        address indexed verifier,
+        uint256 nonce
     );
     event RestrictionSet(address indexed subject, bool restricted, address indexed updatedBy);
     event TierLimitUpdated(AccreditationTier tier, uint256 maxLoanValueUSDC);
@@ -77,6 +90,12 @@ contract ComplianceRegistry {
         emit OfficerUpdated(officer, allowed);
     }
 
+    function setAttestationVerifier(address verifier, bool allowed) external onlyOwner {
+        require(verifier != address(0), "ComplianceRegistry: zero verifier");
+        isAttestationVerifier[verifier] = allowed;
+        emit AttestationVerifierUpdated(verifier, allowed);
+    }
+
     function setTierLimit(AccreditationTier tier, uint256 maxLoanValueUSDC) external onlyOwner {
         maxLoanForTier[tier] = maxLoanValueUSDC;
         emit TierLimitUpdated(tier, maxLoanValueUSDC);
@@ -97,8 +116,73 @@ contract ComplianceRegistry {
         profiles[subject].tier = tier;
         profiles[subject].verifiedAt = uint64(block.timestamp);
         profiles[subject].expiresAt = expiresAt;
+        profiles[subject].attestationHash = bytes32(0);
 
-        emit ProfileUpdated(subject, kycVerified, tier, expiresAt, msg.sender);
+        emit ProfileUpdated(subject, kycVerified, tier, expiresAt, bytes32(0), msg.sender);
+    }
+
+    /// @notice Apply a provider result signed by an authorized verifier.
+    /// @dev The provider keeps the identity documents off-chain. Only a hash of
+    ///      the provider result and its signed eligibility claim are stored here.
+    function setProfileByAttestation(
+        address subject,
+        bool kycVerified,
+        AccreditationTier tier,
+        uint64 validityPeriod,
+        bytes32 attestationHash,
+        uint256 nonce,
+        bytes calldata signature
+    ) external {
+        require(subject != address(0), "ComplianceRegistry: zero subject");
+        require(attestationHash != bytes32(0), "ComplianceRegistry: zero attestation");
+        require(nonce == attestationNonces[subject], "ComplianceRegistry: bad nonce");
+
+        bytes32 digest = getAttestationDigest(
+            subject,
+            kycVerified,
+            tier,
+            validityPeriod,
+            attestationHash,
+            nonce
+        );
+        address verifier = _recover(digest, signature);
+        require(isAttestationVerifier[verifier], "ComplianceRegistry: invalid verifier");
+
+        uint64 expiresAt = validityPeriod == 0 ? uint64(0) : uint64(block.timestamp) + validityPeriod;
+        profiles[subject] = Profile({
+            kycVerified: kycVerified,
+            restricted: profiles[subject].restricted,
+            tier: tier,
+            verifiedAt: uint64(block.timestamp),
+            expiresAt: expiresAt,
+            attestationHash: attestationHash
+        });
+        attestationNonces[subject] = nonce + 1;
+
+        emit ProfileUpdatedByAttestation(subject, tier, expiresAt, attestationHash, verifier, nonce);
+    }
+
+    function getAttestationDigest(
+        address subject,
+        bool kycVerified,
+        AccreditationTier tier,
+        uint64 validityPeriod,
+        bytes32 attestationHash,
+        uint256 nonce
+    ) public view returns (bytes32) {
+        bytes32 payload = keccak256(
+            abi.encode(
+                address(this),
+                block.chainid,
+                subject,
+                kycVerified,
+                tier,
+                validityPeriod,
+                attestationHash,
+                nonce
+            )
+        );
+        return keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", payload));
     }
 
     /// @notice Sanctions/AML block. Overrides KYC + accreditation status entirely while true.
@@ -131,5 +215,21 @@ contract ComplianceRegistry {
 
     function getProfile(address subject) external view returns (Profile memory) {
         return profiles[subject];
+    }
+
+    function _recover(bytes32 digest, bytes calldata signature) internal pure returns (address signer) {
+        require(signature.length == 65, "ComplianceRegistry: bad signature");
+        bytes32 r;
+        bytes32 s;
+        uint8 v;
+        assembly {
+            r := calldataload(signature.offset)
+            s := calldataload(add(signature.offset, 32))
+            v := byte(0, calldataload(add(signature.offset, 64)))
+        }
+        if (v < 27) v += 27;
+        require(v == 27 || v == 28, "ComplianceRegistry: bad v");
+        signer = ecrecover(digest, v, r, s);
+        require(signer != address(0), "ComplianceRegistry: invalid signature");
     }
 }

@@ -25,12 +25,16 @@ contract SelfPayingVaultTest is Test {
     address aiAgent = address(0xAAA1);
     address treasury = address(0xAAA2);
     address borrower = address(0xB0B);
+    uint256 verifierKey = 0x12345;
+    address verifier;
 
     uint256 constant PRICE = 1_000_000000; // 1 RWA token = 1,000 USDC (6 decimals)
 
     function setUp() public {
         registry = new AttestationRegistry(deployer);
         registry.setAttester(deployer, true);
+
+        verifier = vm.addr(verifierKey);
 
         compliance = new ComplianceRegistry(deployer);
         compliance.setOfficer(deployer, true);
@@ -278,6 +282,76 @@ contract SelfPayingVaultTest is Test {
         vm.expectRevert("compliance check failed");
         vault.depositRWAAndBorrow(2 ether, 1_000e6, id);
         vm.stopPrank();
+    }
+
+    function test_SignedKYCProviderAttestationUpdatesProfile() public {
+        compliance.setAttestationVerifier(verifier, true);
+        bytes32 attestationHash = keccak256("provider-result-001");
+        uint64 validity = 365 days;
+        uint256 nonce = compliance.attestationNonces(borrower);
+        bytes32 digest = compliance.getAttestationDigest(
+            borrower,
+            true,
+            ComplianceRegistry.AccreditationTier.Accredited,
+            validity,
+            attestationHash,
+            nonce
+        );
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(verifierKey, digest);
+
+        compliance.setProfileByAttestation(
+            borrower,
+            true,
+            ComplianceRegistry.AccreditationTier.Accredited,
+            validity,
+            attestationHash,
+            nonce,
+            abi.encodePacked(r, s, v)
+        );
+
+        ComplianceRegistry.Profile memory profile = compliance.getProfile(borrower);
+        assertTrue(profile.kycVerified);
+        assertEq(uint256(profile.tier), uint256(ComplianceRegistry.AccreditationTier.Accredited));
+        assertEq(profile.attestationHash, attestationHash);
+        assertEq(compliance.attestationNonces(borrower), nonce + 1);
+    }
+
+    function test_SignedKYCProviderAttestationCannotBeReplayed() public {
+        compliance.setAttestationVerifier(verifier, true);
+        bytes32 attestationHash = keccak256("provider-result-002");
+        uint64 validity = 365 days;
+        uint256 nonce = compliance.attestationNonces(borrower);
+        bytes32 digest = compliance.getAttestationDigest(
+            borrower,
+            true,
+            ComplianceRegistry.AccreditationTier.Retail,
+            validity,
+            attestationHash,
+            nonce
+        );
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(verifierKey, digest);
+        bytes memory signature = abi.encodePacked(r, s, v);
+
+        compliance.setProfileByAttestation(
+            borrower,
+            true,
+            ComplianceRegistry.AccreditationTier.Retail,
+            validity,
+            attestationHash,
+            nonce,
+            signature
+        );
+
+        vm.expectRevert("ComplianceRegistry: bad nonce");
+        compliance.setProfileByAttestation(
+            borrower,
+            true,
+            ComplianceRegistry.AccreditationTier.Retail,
+            validity,
+            attestationHash,
+            nonce,
+            signature
+        );
     }
 
     // ---------------------------------------------------------------------
