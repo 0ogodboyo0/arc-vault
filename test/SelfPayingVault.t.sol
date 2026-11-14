@@ -211,16 +211,17 @@ contract SelfPayingVaultTest is Test {
         vault.depositRWAAndBorrow(2 ether, 1_000e6, id); // 2 RWA @ 1000 = 2000 value, borrow 1000
         vm.stopPrank();
 
+        vault.setCollateralPrice(500_000000); // position becomes undercollateralized
         vm.prank(aiAgent);
-        vault.autoNettingRepay(borrower, 1 ether); // seize 1 RWA (worth 1000 USDC) to clear 1000 debt
+        vault.autoNettingRepay(borrower, 2 ether); // seize 2 RWA (worth 1000 USDC) to clear 1000 debt
 
         ArcRWASelfPayingVault.LoanPosition memory loan = vault.getLoan(borrower);
         assertEq(loan.principal, 0);
         assertFalse(loan.isActive);
-        assertEq(rwa.balanceOf(treasury), 1 ether);
-        // Remaining collateral (1 ether) returned to borrower on close.
+        assertEq(rwa.balanceOf(treasury), 2 ether);
+        // All collateral was seized to clear the debt after the price drop.
         assertEq(loan.collateralAmount, 0);
-        assertEq(rwa.balanceOf(borrower), 209 ether); // 210 - 2 deposited + 1 returned
+        assertEq(rwa.balanceOf(borrower), 208 ether); // 210 - 2 deposited
     }
 
     function test_OnlyAIAgentCanLiquidate() public {
@@ -234,6 +235,49 @@ contract SelfPayingVaultTest is Test {
 
         vm.expectRevert("only AI risk agent");
         vault.autoNettingRepay(borrower, 1 ether);
+    }
+
+    function test_HealthyPositionCannotBeSoftLiquidated() public {
+        uint64 id = _attestBorrower();
+        _kyc(ComplianceRegistry.AccreditationTier.Retail);
+
+        vm.startPrank(borrower);
+        rwa.approve(address(vault), 2 ether);
+        vault.depositRWAAndBorrow(2 ether, 1_000e6, id);
+        vm.stopPrank();
+
+        vm.prank(aiAgent);
+        vm.expectRevert("position healthy");
+        vault.autoNettingRepay(borrower, 1 ether);
+    }
+
+    function test_SecondBorrowAccruesInterestBeforeLTVCheck() public {
+        uint64 id = _attestBorrower();
+        _kyc(ComplianceRegistry.AccreditationTier.Accredited);
+
+        vm.startPrank(borrower);
+        rwa.approve(address(vault), 2 ether);
+        vault.depositRWAAndBorrow(1 ether, 600e6, id);
+        vm.stopPrank();
+
+        vm.warp(block.timestamp + 365 days);
+
+        vm.startPrank(borrower);
+        vm.expectRevert("exceeds max LTV");
+        vault.depositRWAAndBorrow(0.1 ether, 13e6, id);
+        vm.stopPrank();
+    }
+
+    function test_SecondBorrowUsesTotalDebtForComplianceLimit() public {
+        uint64 id = _attestBorrower();
+        _kyc(ComplianceRegistry.AccreditationTier.Retail);
+
+        vm.startPrank(borrower);
+        rwa.approve(address(vault), 200 ether);
+        vault.depositRWAAndBorrow(100 ether, 49_500e6, id);
+        vm.expectRevert("compliance check failed");
+        vault.depositRWAAndBorrow(2 ether, 1_000e6, id);
+        vm.stopPrank();
     }
 
     // ---------------------------------------------------------------------

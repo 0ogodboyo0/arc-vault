@@ -210,8 +210,14 @@ contract ArcRWASelfPayingVault {
         uint256 usdcBorrowAmount,
         uint64 attestationId
     ) external whenNotPaused nonReentrant {
-        // If the loan was active, it will be added to the previous position‌to be
+        require(collateralAmount > 0 && usdcBorrowAmount > 0, "zero amount");
+
+        // Additional borrowing must settle accrued interest first. Otherwise the
+        // LTV and compliance checks can be performed against stale debt.
         if (loans[msg.sender].isActive) {
+            LoanPosition storage existingLoan = loans[msg.sender];
+            _accrueInterest(existingLoan);
+
             uint256 totalCollateral = loans[msg.sender].collateralAmount + collateralAmount;
             uint256 totalBorrow = loans[msg.sender].principal + usdcBorrowAmount;
             
@@ -219,16 +225,16 @@ contract ArcRWASelfPayingVault {
             uint256 maxBorrowAllowed = (totalCollateralValue * maxLTVBps) / BPS_DENOMINATOR;
             require(totalBorrow <= maxBorrowAllowed, "exceeds max LTV");
             
-            require(complianceRegistry.isEligible(msg.sender, usdcBorrowAmount), "compliance check failed");
+            require(complianceRegistry.isEligible(msg.sender, totalBorrow), "compliance check failed");
             require(rwaToken.transferFrom(msg.sender, address(this), collateralAmount), "collateral transfer failed");
             
-            loans[msg.sender].collateralAmount = totalCollateral;
-            loans[msg.sender].principal = totalBorrow;
-            
+            existingLoan.collateralAmount = totalCollateral;
+            existingLoan.principal = totalBorrow;
+
             require(usdc.transfer(msg.sender, usdcBorrowAmount), "USDC payout failed");
+            emit LoanOpened(msg.sender, collateralAmount, usdcBorrowAmount, existingLoan.attestationId);
             return;
         }
-        require(collateralAmount > 0 && usdcBorrowAmount > 0, "zero amount");
         require(attestationSource.isValid(attestationId, msg.sender), "invalid attestation");
 
         uint256 collateralValue = (collateralAmount * collateralPriceUSDC) / COLLATERAL_DECIMALS;
@@ -363,6 +369,9 @@ contract ArcRWASelfPayingVault {
         require(loan.isActive, "no active loan");
         _accrueInterest(loan);
         require(rwaToDeduct > 0 && rwaToDeduct <= loan.collateralAmount, "bad collateral amount");
+        uint256 collateralValue = (loan.collateralAmount * collateralPriceUSDC) / COLLATERAL_DECIMALS;
+        uint256 health = (collateralValue * maxLTVBps) / loan.principal;
+        require(health < BPS_DENOMINATOR, "position healthy");
 
         uint256 seizedValue = (rwaToDeduct * collateralPriceUSDC) / COLLATERAL_DECIMALS;
         uint256 debtReduction = seizedValue > loan.principal ? loan.principal : seizedValue;
