@@ -33,6 +33,7 @@ contract DeployScript is Script {
 
         AttestationRegistry registry = new AttestationRegistry(deployer);
         registry.setAttester(deployer, true); // deployer can issue attestations for demo/testing
+        registry.setIssuer(deployer, true); // demo issuer; replace with approved issuer governance before mainnet
 
         ComplianceRegistry compliance = new ComplianceRegistry(deployer);
         compliance.setOfficer(deployer, true); // deployer can KYC/accredit borrowers for demo/testing

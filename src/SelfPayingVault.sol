@@ -12,6 +12,7 @@ interface IERC20 {
 
 interface IAttestationSource {
     function isValid(uint64 id, address subject) external view returns (bool);
+    function isValidForAsset(uint64 id, address subject, address assetToken) external view returns (bool);
 }
 
 /// @dev Non-view by design: ComplianceRegistry.isEligible emits an on-chain audit event on every
@@ -235,7 +236,10 @@ contract ArcRWASelfPayingVault {
             emit LoanOpened(msg.sender, collateralAmount, usdcBorrowAmount, existingLoan.attestationId);
             return;
         }
-        require(attestationSource.isValid(attestationId, msg.sender), "invalid attestation");
+        require(
+            attestationSource.isValidForAsset(attestationId, msg.sender, address(rwaToken)),
+            "invalid asset attestation"
+        );
 
         uint256 collateralValue = (collateralAmount * collateralPriceUSDC) / COLLATERAL_DECIMALS;
         uint256 maxBorrow = (collateralValue * maxLTVBps) / BPS_DENOMINATOR;

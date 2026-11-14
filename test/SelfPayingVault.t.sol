@@ -33,6 +33,7 @@ contract SelfPayingVaultTest is Test {
     function setUp() public {
         registry = new AttestationRegistry(deployer);
         registry.setAttester(deployer, true);
+        registry.setIssuer(deployer, true);
 
         verifier = vm.addr(verifierKey);
 
@@ -60,7 +61,16 @@ contract SelfPayingVaultTest is Test {
     }
 
     function _attestBorrower() internal returns (uint64 id) {
-        id = registry.attest(borrower, keccak256("asset-doc-hash"), 365 days);
+        id = registry.attestRWA(
+            borrower,
+            address(rwa),
+            deployer,
+            deployer,
+            keccak256("real-estate"),
+            keccak256("asset-001"),
+            keccak256("asset-doc-hash"),
+            365 days
+        );
     }
 
     function _kyc(ComplianceRegistry.AccreditationTier tier) internal {
@@ -76,7 +86,7 @@ contract SelfPayingVaultTest is Test {
 
         vm.startPrank(borrower);
         rwa.approve(address(vault), 1 ether);
-        vm.expectRevert("invalid attestation");
+        vm.expectRevert("invalid asset attestation");
         vault.depositRWAAndBorrow(1 ether, 100e6, 999);
         vm.stopPrank();
     }
@@ -92,6 +102,38 @@ contract SelfPayingVaultTest is Test {
         rwa.approve(address(vault), 1 ether);
         vm.expectRevert("compliance check failed");
         vault.depositRWAAndBorrow(1 ether, 600e6, id);
+        vm.stopPrank();
+    }
+
+    function test_RevertsWhenAttestationTargetsDifferentToken() public {
+        uint64 id = registry.attestRWA(
+            borrower,
+            address(0xCAFE),
+            deployer,
+            deployer,
+            keccak256("real-estate"),
+            keccak256("asset-002"),
+            keccak256("asset-doc-hash-002"),
+            365 days
+        );
+        _kyc(ComplianceRegistry.AccreditationTier.Retail);
+
+        vm.startPrank(borrower);
+        rwa.approve(address(vault), 1 ether);
+        vm.expectRevert("invalid asset attestation");
+        vault.depositRWAAndBorrow(1 ether, 100e6, id);
+        vm.stopPrank();
+    }
+
+    function test_RevertsWhenIssuerIsNoLongerApproved() public {
+        uint64 id = _attestBorrower();
+        registry.setIssuer(deployer, false);
+        _kyc(ComplianceRegistry.AccreditationTier.Retail);
+
+        vm.startPrank(borrower);
+        rwa.approve(address(vault), 1 ether);
+        vm.expectRevert("invalid asset attestation");
+        vault.depositRWAAndBorrow(1 ether, 100e6, id);
         vm.stopPrank();
     }
 
